@@ -22,11 +22,14 @@ class StreamListener(tweepy.StreamListener):
 
             # Finds the first market whose long name is found in the text of the
             # status. None if no match is found.
-            market = next((market for market in self.markets if market["MarketCurrencyLong"] in status.text), None)
+            market = next((market for market in self.markets
+                           if market["MarketCurrencyLong"] in status.text),
+                          None)
 
             # Prints the name of the market if one was found.
             if market:
-                print(f"{market["MarketCurrencyLong"]}: {market["MarketCurrency"]}")
+                print(f"{market['MarketCurrencyLong']}: "
+                      f"{market['MarketCurrency']}")
 
     def on_error(self, status_code):
         if status_code == 420:

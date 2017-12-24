@@ -20,10 +20,15 @@ for configuration of the bot. Below is the base configuration for the bot:
         "user": "",
         "search_term": "",
         "last_tweet_id": ""
+    },
+    "bittrex": {
+        "key": "",
+        "secret": ""
     }
 }
 ```
 
+#### Twitter
 * `key` - Consumer key (API key)
 * `secret` - Consumer secret (API secret)
 * `access_token` - Access token; can be used to make API requests on your own
@@ -35,6 +40,10 @@ empty.
 * `last_tweet_id` - The ID of the last tweet found which met the search
 criteria; there is no need to manually configure this.
 
+#### Bittrex
+* `key` - Bittrex API key.
+* `secret` - Bittrex API secret.
+
 ### Running
 Run `Main.py` to run the bot.
 
@@ -45,3 +54,7 @@ python Main.py
 ### Requirements
 * [Python 3.6](https://www.python.org/downloads/) or higher
 * [tweepy](http://www.tweepy.org/)
+* [freqtrade](https://github.com/gcarq/freqtrade)
+    * Windows users need to instead install a
+    [64-bit version](https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib) of
+    [ta-lib](https://github.com/mrjbq7/ta-lib).
