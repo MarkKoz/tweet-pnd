@@ -29,7 +29,7 @@ for configuration of the bot. Below is the base configuration for the bot:
 * `access_token` - Access token; can be used to make API requests on your own
 account's behalf.
 * `access_secret` - Access secret
-* `user` - The Twitter handle of the user who's tweets will be read.
+* `user` - The Twitter handle of the user whose tweets will be read.
 * `search_term` - A search term to use to filter the user's tweets; ignored if
 empty.
 * `last_tweet_id` - The ID of the last tweet found which met the search
