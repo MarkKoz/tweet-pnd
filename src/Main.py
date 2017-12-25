@@ -1,23 +1,78 @@
 import json
 
 import tweepy
-from tweepy import OAuthHandler
 
 from StreamListener import StreamListener
 
-# Loads the configuration file.
-with open("Configuration.json", "r") as file:
-    config = json.load(file)
+config: dict = {}
+twitter: tweepy.API = None
 
-# Twitter API Setup
-tcfg = config["twitter"]
-auth = OAuthHandler(tcfg["api"]["key"], tcfg["api"]["secret"])
-auth.set_access_token(tcfg["api"]["access_token"], tcfg["api"]["access_secret"])
-api = tweepy.API(auth, wait_on_rate_limit = True)
+def loadConfig() -> dict:
+    """
+    Retrieves the configuration from Configuration.json. The JSON is
+    deserialised into a :class:`dictionary<dict>`.
 
-# Twitter Stream
-listener = StreamListener(api.get_user(tcfg["user"]).id, tcfg["search_term"])
-stream = tweepy.Stream(auth = api.auth, listener = listener, timeout = 60)
-stream.filter(follow = [str(stream.listener.userID)])
-# track = [tcfg["search_term"]] Better to use this but it doesn't seem to filter
-# properly
+    Returns
+    -------
+    Dict
+        The configuration.
+    """
+    with open("Configuration.json", "r") as file:
+        return json.load(file)
+
+def getTwitterAPI() -> tweepy.API:
+    """
+    Creates a Tweepy API object from the configuration.
+
+    Returns
+    -------
+    tweepy.API
+        The API object.
+    """
+    apicfg = config["twitter"]["api"]
+    auth = tweepy.OAuthHandler(apicfg["key"], apicfg["secret"])
+    auth.set_access_token(apicfg["access_token"],
+                          apicfg["access_secret"])
+
+    return tweepy.API(auth, wait_on_rate_limit = True)
+
+def startStream(callback) -> tweepy.Stream:
+    """
+    Creates and starts a :class:`stream<tweepy.Stream>` of the user's tweets
+    which match the search term in the configuration and contain a Bittrex
+    currency.
+
+    Returns
+    -------
+    None
+    """
+    listener = StreamListener(config,
+                              twitter.get_user(config["twitter"]["user"]).id,
+                              callback)
+    stream = tweepy.Stream(auth = twitter.auth,
+                           listener = listener)
+    searchTerm: str = config["twitter"]["search_term"]
+
+    if searchTerm:
+        stream.filter(async = True,
+                      follow = [str(stream.listener.user)],
+                      track = [searchTerm])
+    else:
+        stream.filter(async = True, follow = [str(stream.listener.user)])
+
+    return stream
+
+def onTweet(currency: dict) -> None:
+    print(f"{currency['CurrencyLong']}: "
+          f"{currency['Currency']}")
+
+def main():
+    global config
+    global twitter
+    config = loadConfig()
+    twitter = getTwitterAPI()
+
+    stream = startStream(onTweet)
+
+if __name__ == "__main__":
+    main()
