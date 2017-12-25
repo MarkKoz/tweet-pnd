@@ -1,17 +1,22 @@
+import logging
+
 import tweepy
 from bittrex import Bittrex
 
 class StreamListener(tweepy.StreamListener):
     config: dict = {}
     bittrex: Bittrex = None
+    log: logging.Logger = None
 
-    def __init__(self, cfg, user, callback = None):
+    def __init__(self, cfg, logger, user, callback = None):
         global config
         global bittrex
+        global log
         config = cfg
         bittrex = Bittrex(config["bittrex"]["key"],
                           config["bittrex"]["secret"],
                           api_version = "v2.0")
+        log = logger
 
         super(StreamListener, self).__init__()
 
@@ -26,16 +31,11 @@ class StreamListener(tweepy.StreamListener):
         self.currencies = self.currencies["result"]
 
     def on_status(self, status):
-        print(f"{status.author.screen_name}\t{status.text}")
+        # log.info(f"{status.author.screen_name} tweeted | {status.text}")
 
         # Only parses statuses by the author; ignores retweets, replies, etc.
         if status.author.id == self.user:
-            print("Message by the author found.")
-
-            # If a search term was specified, ignores statuses which don't
-            # contain the search term.
-            # if self.searchTerm and self.searchTerm.lower() not in status.text.lower():
-            #     return
+            log.info(f"User tweeted | {status.text}")
 
             # Finds the first currency whose long name is found in the text of
             # the status. None if no match is found.
@@ -51,12 +51,13 @@ class StreamListener(tweepy.StreamListener):
     def on_error(self, status_code):
         if status_code == 420:
             # TODO: Handle rate limiting properly instead of closing the stream.
-            print("Being rate limited. Stream closing.")
+            log.error("The stream has closed due to rate limiting.")
             return False
 
-        print(f"Error with code: {status_code}")
+        log.error(f"The stream encountered an error with code {status_code}")
         return True
 
     def on_timeout(self):
         print("Stream timed out.")
+        log.warning("The stream timed out.")
         return True

@@ -18,8 +18,7 @@ for configuration of the bot. Below is the base configuration for the bot:
             "access_secret": ""
         },
         "user": "",
-        "search_term": "",
-        "last_tweet_id": ""
+        "search_term": ""
     },
     "bittrex": {
         "key": "",
@@ -37,8 +36,6 @@ account's behalf.
 * `user` - The Twitter handle of the user whose tweets will be read.
 * `search_term` - A search term to use to filter the user's tweets; ignored if
 empty.
-* `last_tweet_id` - The ID of the last tweet found which met the search
-criteria; there is no need to manually configure this.
 
 #### Bittrex
 * `key` - Bittrex API key.

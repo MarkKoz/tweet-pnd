@@ -1,4 +1,5 @@
 import json
+import logging
 
 import tweepy
 
@@ -6,6 +7,7 @@ from StreamListener import StreamListener
 
 config: dict = {}
 twitter: tweepy.API = None
+log: logging.Logger = None
 
 def loadConfig() -> dict:
     """
@@ -47,6 +49,7 @@ def startStream(callback) -> tweepy.Stream:
     None
     """
     listener = StreamListener(config,
+                              log,
                               twitter.get_user(config["twitter"]["user"]).id,
                               callback)
     stream = tweepy.Stream(auth = twitter.auth,
@@ -63,16 +66,40 @@ def startStream(callback) -> tweepy.Stream:
     return stream
 
 def onTweet(currency: dict) -> None:
-    print(f"{currency['CurrencyLong']}: "
-          f"{currency['Currency']}")
+    log.info(f"Currency | {currency['CurrencyLong']} ({currency['Currency']})")
+
+def startLogger() -> logging.Logger:
+    logger: logging.Logger = logging.getLogger("TweetPnD")
+    logger.setLevel(logging.INFO)
+
+    handler: logging.Handler = logging.StreamHandler()
+    handler.setLevel(logging.INFO)
+    handler.setFormatter(logging.Formatter("%(asctime)s - [%(levelname)s] "
+                                           "%(name)s: %(message)s"))
+    logger.addHandler(handler)
+
+    return logger
 
 def main():
     global config
     global twitter
+    global log
     config = loadConfig()
     twitter = getTwitterAPI()
+    log = startLogger()
 
-    stream = startStream(onTweet)
+    stream: tweepy.Stream = startStream(onTweet)
+
+    while True:
+        inp: str = input("Enter 'exit' at any time to disconnect from the "
+                         "stream.\n")
+
+        if inp.lower() == "exit":
+            log.info("Disconnecting from the stream.")
+            stream.disconnect()
+            break
+
+    log.info("Steam has been disconnected. The program will now close.")
 
 if __name__ == "__main__":
     main()
