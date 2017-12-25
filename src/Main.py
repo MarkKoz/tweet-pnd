@@ -33,8 +33,12 @@ def getTwitterAPI() -> tweepy.API:
     """
     apicfg = config["twitter"]["api"]
     auth = tweepy.OAuthHandler(apicfg["key"], apicfg["secret"])
-    auth.set_access_token(apicfg["access_token"],
-                          apicfg["access_secret"])
+
+    token: str = apicfg["access_token"]
+    secret: str = apicfg["access_secret"]
+
+    if token and secret:
+        auth.set_access_token(token, secret)
 
     return tweepy.API(auth, wait_on_rate_limit = True)
 
@@ -48,12 +52,11 @@ def startStream(callback) -> tweepy.Stream:
     -------
     None
     """
-    listener = StreamListener(config,
-                              log,
-                              twitter.get_user(config["twitter"]["user"]).id,
-                              callback)
-    stream = tweepy.Stream(auth = twitter.auth,
-                           listener = listener)
+    id: int = twitter.get_user(config["twitter"]["user"]).id
+
+    listener: StreamListener = StreamListener(config, log, id, callback)
+    stream: tweepy.Stream = tweepy.Stream(auth = twitter.auth,
+                                          listener = listener)
     searchTerm: str = config["twitter"]["search_term"]
 
     if searchTerm:

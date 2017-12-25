@@ -1,6 +1,7 @@
 import logging
 
 import tweepy
+from tweepy.models import Status
 from bittrex import Bittrex
 
 class StreamListener(tweepy.StreamListener):
@@ -8,7 +9,11 @@ class StreamListener(tweepy.StreamListener):
     bittrex: Bittrex = None
     log: logging.Logger = None
 
-    def __init__(self, cfg, logger, user, callback = None):
+    def __init__(self,
+                 cfg: dict,
+                 logger: logging.Logger,
+                 user: int,
+                 callback = None):
         global config
         global bittrex
         global log
@@ -20,17 +25,26 @@ class StreamListener(tweepy.StreamListener):
 
         super(StreamListener, self).__init__()
 
-        self.user = user
-        self.currencies = bittrex.get_currencies()
+        self.user: int = user
+        self.currencies: list = []
         self.callback = callback
 
-        if not self.currencies["success"]:
+        self.getCurrencies()
+
+    def getCurrencies(self):
+        curr: dict = bittrex.get_currencies()
+
+        if not curr["success"]:
             raise RuntimeError("The currencies could not be retrieved from "
                                "Bittrex.")
 
-        self.currencies = self.currencies["result"]
+        self.currencies = curr["result"]
+        log.info(f"Loaded {len(self.currencies)} currencies from Bittrex.")
 
-    def on_status(self, status):
+        self.currencies = [c for c in self.currencies if c["IsActive"]]
+        log.info(f"Narrowed down to {len(self.currencies)} active currencies.")
+
+    def on_status(self, status: Status):
         # log.info(f"{status.author.screen_name} tweeted | {status.text}")
 
         # Only parses statuses by the author; ignores retweets, replies, etc.
@@ -47,17 +61,18 @@ class StreamListener(tweepy.StreamListener):
             # Prints the name of currency market if one was found.
             if currency:
                 self.callback(currency)
+            else:
+                log.warning("The currency in the tweet is not on Bittrex.")
 
-    def on_error(self, status_code):
+    def on_error(self, status_code: int) -> bool:
         if status_code == 420:
-            # TODO: Handle rate limiting properly instead of closing the stream.
+            # TODO: Handle rate limiting properly.
             log.error("The stream has closed due to rate limiting.")
-            return False
+            return True
 
         log.error(f"The stream encountered an error with code {status_code}")
         return True
 
-    def on_timeout(self):
-        print("Stream timed out.")
+    def on_timeout(self) -> bool:
         log.warning("The stream timed out.")
         return True
