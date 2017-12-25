@@ -47,8 +47,9 @@ class StreamListener(tweepy.StreamListener):
     def on_status(self, status: Status):
         # log.info(f"{status.author.screen_name} tweeted | {status.text}")
 
-        # Only parses statuses by the author; ignores retweets, replies, etc.
-        if status.author.id == self.user:
+        # Only parses statuses by the author and ignores retweets.
+        if status.author.id == self.user and \
+                not hasattr(status, "retweeted_status"):
             log.info(f"User tweeted | {status.text}")
 
             # Finds the first currency whose long name is found in the text of
