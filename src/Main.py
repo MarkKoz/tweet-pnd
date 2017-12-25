@@ -16,7 +16,7 @@ def loadConfig() -> dict:
 
     Returns
     -------
-    Dict
+    dict
         The configuration.
     """
     with open("Configuration.json", "r") as file:
@@ -48,9 +48,15 @@ def startStream(callback) -> tweepy.Stream:
     which match the search term in the configuration and contain a Bittrex
     currency.
 
+    Parameters
+    ----------
+    callback
+        The function to execute when a desired tweet is successfully found.
+
     Returns
     -------
-    None
+    tweepy.Stream
+        The stream which is created.
     """
     id: int = twitter.get_user(config["twitter"]["user"]).id
 
@@ -68,10 +74,30 @@ def startStream(callback) -> tweepy.Stream:
 
     return stream
 
-def onTweet(currency: dict) -> None:
+def onTweet(currency) -> None:
+    """
+    The callback used when a desired tweet is successfully found.
+
+    Parameters
+    ----------
+    currency
+        The currency found in the tweet.
+
+    Returns
+    -------
+    None
+    """
     log.info(f"Currency | {currency['CurrencyLong']} ({currency['Currency']})")
 
 def startLogger() -> logging.Logger:
+    """
+    Creates and starts a logger named 'TweetPnD'.
+
+    Returns
+    -------
+    logging.Logger
+        The logger which is created.
+    """
     logger: logging.Logger = logging.getLogger("TweetPnD")
     logger.setLevel(logging.INFO)
 
@@ -83,7 +109,7 @@ def startLogger() -> logging.Logger:
 
     return logger
 
-def main():
+def main() -> None:
     global config
     global twitter
     global log
