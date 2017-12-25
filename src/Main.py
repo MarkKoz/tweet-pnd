@@ -48,6 +48,12 @@ def startStream(callback) -> tweepy.Stream:
     which match the search term in the configuration and contain a Bittrex
     currency.
 
+    Note
+    -------
+    Stream filter parameters behave like an OR rather than an AND. Therefore,
+    the track parameter is not used. Instead, tweets are further filtered in the
+    :class:`StreamListener`.
+
     Parameters
     ----------
     callback
@@ -63,14 +69,7 @@ def startStream(callback) -> tweepy.Stream:
     listener: StreamListener = StreamListener(config, log, id, callback)
     stream: tweepy.Stream = tweepy.Stream(auth = twitter.auth,
                                           listener = listener)
-    searchTerm: str = config["twitter"]["search_term"]
-
-    if searchTerm:
-        stream.filter(async = True,
-                      follow = [str(stream.listener.user)],
-                      track = [searchTerm])
-    else:
-        stream.filter(async = True, follow = [str(stream.listener.user)])
+    stream.filter(async = True, follow = [str(stream.listener.user)])
 
     return stream
 

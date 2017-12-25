@@ -45,18 +45,23 @@ class StreamListener(tweepy.StreamListener):
         log.info(f"Narrowed down to {len(self.currencies)} active currencies.")
 
     def on_status(self, status: Status):
+        text: str = status.text.lower()
         # log.info(f"{status.author.screen_name} tweeted | {status.text}")
 
         # Only parses statuses by the author and ignores retweets.
-        if status.author.id == self.user and \
-                not hasattr(status, "retweeted_status"):
+        if status.author.id == self.user and not hasattr(status, "retweeted_status"):
+            term: str = config["twitter"]["search_term"]
+
+            if term and term.lower() not in text:
+                return
+
             log.info(f"User tweeted | {status.text}")
 
             # Finds the first currency whose long name is found in the text of
             # the status. None if no match is found.
             currency = next((currency for currency in self.currencies
-                             if currency["CurrencyLong"] in status.text or
-                             currency["Currency"] in status.text),
+                             if currency["CurrencyLong"].lower() in text or
+                             currency["Currency"].lower() in text),
                             None)
 
             # Prints the name of currency market if one was found.
