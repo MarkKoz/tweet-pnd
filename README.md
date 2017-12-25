@@ -44,6 +44,7 @@ empty.
 ### Requirements
 * [Python 3.6](https://www.python.org/downloads/) or higher
 * [tweepy](http://www.tweepy.org/)
+* [python-bittrex](https://github.com/ericsomdahl/python-bittrex)
 * [freqtrade](https://github.com/gcarq/freqtrade)
     * On Windows, use Anaconda for [NumPy](http://www.numpy.org/) and
     [SciPy](https://www.scipy.org/) or install the wheels from
@@ -87,7 +88,9 @@ the rest of the dependencies can be installed as normal.
 Run `Main.py` to run the bot. If using pipenv:
 
 ```bash
-pipenv run python Main.py
+pipenv shell
+cd src
+python Main.py
 ```
 
 otherwise

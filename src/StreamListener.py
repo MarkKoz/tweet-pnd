@@ -41,8 +41,8 @@ class StreamListener(tweepy.StreamListener):
         self.currencies = curr["result"]
         log.info(f"Loaded {len(self.currencies)} currencies from Bittrex.")
 
-        self.currencies = [c for c in self.currencies if c["IsActive"]]
-        log.info(f"Narrowed down to {len(self.currencies)} active currencies.")
+        # self.currencies = [c for c in self.currencies if c["IsActive"]]
+        # log.info(f"Narrowed down to {len(self.currencies)} active currencies.")
 
     def on_status(self, status: Status):
         text: str = status.text.lower()

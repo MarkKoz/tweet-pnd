@@ -87,6 +87,7 @@ def onTweet(currency) -> None:
     None
     """
     log.info(f"Currency | {currency['CurrencyLong']} ({currency['Currency']})")
+    # TODO: Check if currency is currently active.
 
 def startLogger() -> logging.Logger:
     """
