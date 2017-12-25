@@ -44,17 +44,57 @@ criteria; there is no need to manually configure this.
 * `key` - Bittrex API key.
 * `secret` - Bittrex API secret.
 
-### Running
-Run `Main.py` to run the bot.
-
-```bash
-python Main.py
-```
-
 ### Requirements
 * [Python 3.6](https://www.python.org/downloads/) or higher
 * [tweepy](http://www.tweepy.org/)
 * [freqtrade](https://github.com/gcarq/freqtrade)
-    * Windows users need to instead install a
+    * On Windows, use Anaconda for [NumPy](http://www.numpy.org/) and
+    [SciPy](https://www.scipy.org/) or install the wheels from
+    [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/).
+    * 64-bit Windows users need to instead install a
     [64-bit version](https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib) of
     [ta-lib](https://github.com/mrjbq7/ta-lib).
+
+### Installation
+[pipenv](https://docs.pipenv.org/) can be used to simply the installation
+process. Once it is installed, `cd` into the root directory and install the
+dependencies from the pipefile using the command
+
+```bash
+pipenv install
+```
+
+Thee may be issues with it attempting to install `python-bittrex` from git. If
+this is the case, simply install the package with pip before running the
+command above. Because the virtualenv inherits global packages, it can be
+installed either globally with `pip install` or locally with `pipenv install`.
+
+For 64-bit Windows users, `ta-lib` needs to be installed from a wheel using
+the link provided in the requirements section above. First run
+
+```bash
+pipenv uninstall ta-lib
+```
+
+and then
+
+```bash
+pipenv install <wheel-file.whl>
+```
+
+to install the package from the wheel. The same should be done for NumPy, SciPy,
+and any other dependencies being installed as wheels if applicable. Afterwards,
+the rest of the dependencies can be installed as normal.
+
+### Running
+Run `Main.py` to run the bot. If using pipenv:
+
+```bash
+pipenv run python Main.py
+```
+
+otherwise
+
+```bash
+python Main.py
+```

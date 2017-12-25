@@ -12,7 +12,7 @@ class StreamListener(tweepy.StreamListener):
         print(f"{status.author.screen_name}\t{status.text}")
 
         # Only parses statuses by the author; ignores retweets, replies, etc.
-        if str(status.author.id) == self.userID:
+        if status.author.id == self.userID:
             print("Message by the author found.")
 
             # If a search term was specified, ignores statuses which don't
