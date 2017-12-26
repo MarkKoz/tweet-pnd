@@ -20,9 +20,18 @@ for configuration of the bot. Below is the base configuration for the bot:
         "user": "",
         "search_term": ""
     },
-    "bittrex": {
-        "key": "",
-        "secret": ""
+    "exchanges": {
+        "binance": {
+            "enabled": false,
+            "key": "",
+            "secret": ""
+        },
+        "bittrex": {
+            "enabled": true,
+            "key": "",
+            "secret": ""
+        },
+        "preferred": "bittrex"
     }
 }
 ```
@@ -37,13 +46,17 @@ account's behalf.
 * `search_term` - A search term to use to filter the user's tweets; ignored if
 empty.
 
-#### Bittrex
-* `key` - Bittrex API key.
-* `secret` - Bittrex API secret.
+#### Exchanges
+* `enabled` - `true` if this exchange should be used; `false` otherwise.
+* `key` -  The exchange's API key.
+* `secret` - The exchange's API secret.
+* `preferred` - The name of the preferred exchange; it will have the highest
+priority when selecting the exchange on which to place an order.
 
 ### Requirements
 * [Python 3.6](https://www.python.org/downloads/) or higher
 * [tweepy](http://www.tweepy.org/)
+* [python-binance](https://github.com/sammchardy/python-binance)
 * [python-bittrex](https://github.com/ericsomdahl/python-bittrex)
 
 ### Installation

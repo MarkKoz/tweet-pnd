@@ -10,8 +10,8 @@ class Bittrex:
         self._api: bx = self._get_api()
 
     def _get_api(self) -> bx:
-        key: str = g.config["bittrex"]["key"]
-        secret: str = g.config["bittrex"]["secret"]
+        key: str = g.config["exchanges"]["bittrex"]["key"]
+        secret: str = g.config["exchanges"]["bittrex"]["secret"]
 
         if not key:
             self._log.warning("Key is missing from the config.")
@@ -19,7 +19,7 @@ class Bittrex:
         if not secret:
             self._log.warning("Secret is missing from the config.")
 
-        return bx(g.config["bittrex"]["key"], g.config["bittrex"]["secret"])
+        return bx(key, secret)
 
     def get_currencies(self) -> list:
         currencies: dict = self._api.get_currencies()
@@ -38,7 +38,6 @@ class Bittrex:
             currencies = self.get_currencies()
 
         active = [c for c in currencies if c["IsActive"]]
-
         self._log.info(f"Narrowed down to {len(active)} active currencies.")
 
         return active

@@ -1,3 +1,5 @@
+from exchanges.binance import Binance
+from exchanges.bittrex import Bittrex
 from twitter.twitter import Twitter
 from utils import globals as g, utils
 
@@ -8,6 +10,12 @@ def main() -> None:
         return
 
     twitter = Twitter()
+
+    if g.config["exchanges"]["binance"]["enabled"]:
+        binance = Binance()
+
+    if g.config["exchanges"]["bittrex"]["enabled"]:
+        bittrex = Bittrex()
 
     while twitter.stream.running:
         inp: str = input("Enter 'exit' at any time to disconnect from the "
