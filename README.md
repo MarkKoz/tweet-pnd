@@ -18,7 +18,8 @@ for configuration of the bot. Below is the base configuration for the bot:
             "access_secret": ""
         },
         "user": "",
-        "search_term": ""
+        "search_term": "",
+        "ignore_retweets": true
     },
     "exchanges": {
         "binance": {
@@ -36,6 +37,9 @@ for configuration of the bot. Below is the base configuration for the bot:
 }
 ```
 
+* `tesseract_cmd` - Path to the tesseract binary; ignored if empty. Unnecessary
+if it is in the system's `PATH`.
+
 #### Twitter
 * `key` - Consumer key (API key)
 * `secret` - Consumer secret (API secret)
@@ -45,6 +49,7 @@ account's behalf.
 * `user` - The Twitter handle of the user whose tweets will be read.
 * `search_term` - A search term to use to filter the user's tweets; ignored if
 empty.
+* `ignore_retweets` - Does not parse tweets which are retweets.
 
 #### Exchanges
 * `enabled` - `true` if this exchange should be used; `false` otherwise.
@@ -59,7 +64,7 @@ priority when selecting the exchange on which to place an order.
 * [pytesseract](https://github.com/madmaze/pytesseract)
     * Requires
     [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) to be
-    installed and present in the system's `PATH`. See
+    installed on the system. See
     [this](https://github.com/tesseract-ocr/tesseract/wiki) page for more
     specific installation instructions.
 * [python-binance](https://github.com/sammchardy/python-binance)

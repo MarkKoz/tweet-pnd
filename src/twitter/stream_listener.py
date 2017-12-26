@@ -20,17 +20,27 @@ class StreamListener(tweepy.StreamListener):
     def on_status(self, status: Status):
         text: str = status.text.lower()
 
-        # Only parses statuses by the user and ignores retweets.
-        if status.author.id == self.user and not hasattr(status, "retweeted_status"):
-            term: str = g.config["twitter"]["search_term"]
-
-            if term and term.lower() not in text:
+        # Only parses statuses by the user.
+        if status.author.id == self.user:
+            if g.config["twitter"]["ignore_retweets"] and \
+                    hasattr(status, "retweeted_status"):
                 return
+
+            term: str = g.config["twitter"]["search_term"]
+            if term and term.lower() not in text: return
+
+            if not hasattr(status, "entities"): return
+
+            media = status.entities["media"]
+            if not media: return
+
+            photo = next((o for o in media if o["type"] == "photo"),  None)
+            if not photo: return
 
             self._log.info(f"User tweeted | {status.text}")
 
             if self._callback:
-                self._callback(status)
+                self._callback(photo["media_url"])
 
     def on_error(self, status_code: int) -> bool:
         if status_code == 420:

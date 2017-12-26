@@ -1,7 +1,16 @@
 from exchanges.binance import Binance
 from exchanges.bittrex import Bittrex
 from twitter.twitter import Twitter
+from twitter import image
 from utils import globals as g, utils
+
+def on_tweet(url: str):
+    g.log.info(url)
+
+    img = image.get_image(url)
+    contents: str = image.to_text(img)
+
+    g.log.info(contents)
 
 def main() -> None:
     utils.get_logger("bot")
@@ -9,7 +18,8 @@ def main() -> None:
     if not utils.load_config():
         return
 
-    twitter = Twitter()
+    twitter = Twitter(on_tweet)
+    image.init()
 
     if g.config["exchanges"]["binance"]["enabled"]:
         binance = Binance()
