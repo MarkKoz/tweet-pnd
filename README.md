@@ -56,15 +56,36 @@ priority when selecting the exchange on which to place an order.
 ### Requirements
 * [Python 3.6](https://www.python.org/downloads/) or higher
 * [tweepy](http://www.tweepy.org/)
+* [pytesseract](https://github.com/madmaze/pytesseract)
+    * Requires
+    [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) to be
+    installed and present in the system's `PATH`. See
+    [this](https://github.com/tesseract-ocr/tesseract/wiki) page for more
+    specific installation instructions.
 * [python-binance](https://github.com/sammchardy/python-binance)
 * [python-bittrex](https://github.com/ericsomdahl/python-bittrex)
 
 ### Installation
 [pipenv](https://docs.pipenv.org/) can be used to simply the installation
 process. Once it is installed, `cd` into the root directory and install the
-dependencies from the pipefile using the command
+dependencies from the pipefile with
 
 ```bash
+pipenv install
+```
+
+An error may occur while installing python-binance on Windows. More specifically
+
+> Failed building wheel for Twisted
+
+The error can be circumvented by downloading a pre-built wheel of Twisted from
+[here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#twisted). Download the
+32-bit or 64-bit version depending on your OS and move the file into the root
+directory of the program. To install Twisted and finish the installation of
+python-binance run
+
+```bash
+pipenv install twisted-wheel-file-name.whl
 pipenv install
 ```
 

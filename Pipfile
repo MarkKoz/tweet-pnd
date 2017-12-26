@@ -9,27 +9,9 @@ name = "pypi"
 
 tweepy = "*"
 python-bittrex = "*"
-sqlalchemy = "*"
-python-telegram-bot = "*"
-arrow = "*"
-cachetools = "*"
-requests = "*"
-"urllib3" = "*"
-wrapt = "*"
-pandas = "*"
-scikit-learn = "*"
-scipy = "*"
-jsonschema = "*"
-numpy = "*"
-hyperopt = "*"
-networkx = "*"
-tabulate = "*"
-freqtrade = {git = "git://github.com/gcarq/freqtrade.git", ref = "master"}
-"5780735" = {path = ".\\TA_Lib-0.4.10-cp36-cp36m-win_amd64.whl"}
+pytesseract = "*"
+python-binance = "*"
 
 
 [dev-packages]
 
-pytest = "*"
-pytest-mock = "*"
-pytest-cov = "*"
