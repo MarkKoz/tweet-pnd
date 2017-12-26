@@ -1,13 +1,11 @@
 import json
-import logging
 
 import tweepy
+from bittrex import Bittrex
 
+import Globals as g
+import Logging
 from StreamListener import StreamListener
-
-config: dict = {}
-twitter: tweepy.API = None
-log: logging.Logger = None
 
 def loadConfig() -> dict:
     """
@@ -31,7 +29,7 @@ def getTwitterAPI() -> tweepy.API:
     tweepy.API
         The API object.
     """
-    apicfg = config["twitter"]["api"]
+    apicfg = g.config["twitter"]["api"]
     auth = tweepy.OAuthHandler(apicfg["key"], apicfg["secret"])
 
     token: str = apicfg["access_token"]
@@ -64,10 +62,10 @@ def startStream(callback) -> tweepy.Stream:
     tweepy.Stream
         The stream which is created.
     """
-    id: int = twitter.get_user(config["twitter"]["user"]).id
+    user: int = g.twitter.get_user(g.config["twitter"]["user"]).id
 
-    listener: StreamListener = StreamListener(config, log, id, callback)
-    stream: tweepy.Stream = tweepy.Stream(auth = twitter.auth,
+    listener: StreamListener = StreamListener(user, callback)
+    stream: tweepy.Stream = tweepy.Stream(auth = g.twitter.auth,
                                           listener = listener)
     stream.filter(async = True, follow = [str(stream.listener.user)])
 
@@ -86,49 +84,29 @@ def onTweet(currency) -> None:
     -------
     None
     """
-    log.info(f"Currency | {currency['CurrencyLong']} ({currency['Currency']})")
+    g.log.info(f"Currency | {currency['CurrencyLong']} "
+               f"({currency['Currency']})")
     # TODO: Check if currency is currently active.
 
-def startLogger() -> logging.Logger:
-    """
-    Creates and starts a logger named 'TweetPnD'.
-
-    Returns
-    -------
-    logging.Logger
-        The logger which is created.
-    """
-    logger: logging.Logger = logging.getLogger("TweetPnD")
-    logger.setLevel(logging.INFO)
-
-    handler: logging.Handler = logging.StreamHandler()
-    handler.setLevel(logging.INFO)
-    handler.setFormatter(logging.Formatter("%(asctime)s - [%(levelname)s] "
-                                           "%(name)s: %(message)s"))
-    logger.addHandler(handler)
-
-    return logger
-
 def main() -> None:
-    global config
-    global twitter
-    global log
-    config = loadConfig()
-    twitter = getTwitterAPI()
-    log = startLogger()
+    g.config = loadConfig()
+    g.twitter = getTwitterAPI()
+    g.bittrex = Bittrex(g.config["bittrex"]["key"],
+                        g.config["bittrex"]["secret"],
+                        api_version = "v2.0")
 
     stream: tweepy.Stream = startStream(onTweet)
 
-    while True:
+    while stream.running:
         inp: str = input("Enter 'exit' at any time to disconnect from the "
                          "stream.\n")
 
         if inp.lower() == "exit":
-            log.info("Disconnecting from the stream.")
+            g.log.info("Disconnecting from the stream.")
             stream.disconnect()
             break
 
-    log.info("Steam has been disconnected. The program will now close.")
+    g.log.info("Steam has been disconnected. The program will now close.")
 
 if __name__ == "__main__":
     main()

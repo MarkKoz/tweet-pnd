@@ -1,27 +1,13 @@
-import logging
-
 import tweepy
 from tweepy.models import Status
-from bittrex import Bittrex
+
+import Globals as g
+import Logging
 
 class StreamListener(tweepy.StreamListener):
-    config: dict = {}
-    bittrex: Bittrex = None
-    log: logging.Logger = None
-
-    def __init__(self,
-                 cfg: dict,
-                 logger: logging.Logger,
-                 user: int,
-                 callback = None):
-        global config
-        global bittrex
+    def __init__(self, user: int, callback = None):
         global log
-        config = cfg
-        bittrex = Bittrex(config["bittrex"]["key"],
-                          config["bittrex"]["secret"],
-                          api_version = "v2.0")
-        log = logger
+        log = Logging.getLogger("Stream")
 
         super(StreamListener, self).__init__()
 
@@ -32,7 +18,7 @@ class StreamListener(tweepy.StreamListener):
         self.getCurrencies()
 
     def getCurrencies(self):
-        curr: dict = bittrex.get_currencies()
+        curr: dict = g.bittrex.get_currencies()
 
         if not curr["success"]:
             raise RuntimeError("The currencies could not be retrieved from "
@@ -48,9 +34,9 @@ class StreamListener(tweepy.StreamListener):
         text: str = status.text.lower()
         # log.info(f"{status.author.screen_name} tweeted | {status.text}")
 
-        # Only parses statuses by the author and ignores retweets.
+        # Only parses statuses by the user and ignores retweets.
         if status.author.id == self.user and not hasattr(status, "retweeted_status"):
-            term: str = config["twitter"]["search_term"]
+            term: str = g.config["twitter"]["search_term"]
 
             if term and term.lower() not in text:
                 return
@@ -82,3 +68,6 @@ class StreamListener(tweepy.StreamListener):
     def on_timeout(self) -> bool:
         log.warning("The stream timed out.")
         return True
+
+    def on_disconnect(self, notice):
+        log.warning(f"Stream disconnected with notice f{notice}")
