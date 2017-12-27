@@ -42,7 +42,7 @@ def main() -> None:
             twitter.stream.disconnect()
             break
 
-    g.log.info("Steam has disconnected. The program will now close.")
+    g.log.info("Stream has disconnected. The program will now close.")
 
 if __name__ == "__main__":
     main()

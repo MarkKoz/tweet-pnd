@@ -1,4 +1,4 @@
-from itertools import chain
+from itertools import chain, filterfalse
 from typing import List
 import inspect
 import pkgutil
@@ -26,11 +26,12 @@ def get_exchange_classes() -> dict:
                                   for mod in modules)
 
     # Converts to a dictionary with lowercase keys.
-    return dict((name.lower(), val) for name, val in members)
+    return dict((name.lower(), value) for name, value in members)
 
 def get_exchanges() -> List[Exchange]:
     classes: dict = get_exchange_classes()
+    exs = filterfalse(lambda item: not item[1]["priority"],
+                      g.config["exchanges"].items())
+    srt = sorted(exs, key = lambda ex: ex[1]["priority"])
 
-    return [classes[name]()
-            for name, v in g.config["exchanges"].items()
-            if isinstance(v, dict) and v["enabled"]]
+    return list(map(lambda ex: classes[ex[0]](), srt))

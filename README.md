@@ -23,18 +23,18 @@ for configuration of the bot. Below is the base configuration for the bot:
     },
     "exchanges": {
         "binance": {
-            "enabled": false,
+            "priority": 0,
             "key": "",
             "secret": ""
         },
         "bittrex": {
-            "enabled": true,
+            "priority": 1,
             "key": "",
             "secret": ""
-        },
-        "preferred": "bittrex",
-        "verbose: false
-    }
+        }
+    },
+    "tesseract_cmd": "",
+    "verbose: false
 }
 ```
 
@@ -55,11 +55,10 @@ empty.
 * `ignore_retweets` - Does not parse tweets which are retweets.
 
 #### Exchanges
-* `enabled` - `true` if this exchange should be used; `false` otherwise.
+* `priority` - A positive integer representing the priority of the exchange.
+Lower numbers have higher priority. Set to `0` to disable the exchange.
 * `key` -  The exchange's API key.
 * `secret` - The exchange's API secret.
-* `preferred` - The name of the preferred exchange; it will have the highest
-priority when selecting the exchange on which to place an order.
 
 ### Requirements
 * [Python 3.6](https://www.python.org/downloads/) or higher

@@ -31,7 +31,7 @@ def parse_currency(text: str) -> Union[ParseResult, None]:
         currencies: List[Exchange.Currency] = ex.get_active_currencies()
         currency: Union[Exchange.Currency, None] = next(
                 (c for c in currencies
-                 if re.search(c.name + r"[( ]?\(?" + c.symbol,
+                 if re.search(c.name + r"[( ]*?\(?" + c.symbol,
                               text,
                               re.IGNORECASE)),
                 None)
