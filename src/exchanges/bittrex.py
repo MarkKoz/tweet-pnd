@@ -27,11 +27,12 @@ class Bittrex(Exchange):
         currencies: dict = self._api.get_currencies()
 
         if not currencies["success"]:
-            raise RuntimeError("The currencies could not be retrieved from "
-                               "Bittrex.")
+            self._log.error("The currencies could not be retrieved from "
+                            "Bittrex.")
+            return []
 
         currencies = currencies["result"]
-        self._log.info(f"Retrieved {len(currencies)} currencies from Bittrex.")
+        self._log.debug(f"Retrieved {len(currencies)} currencies from Bittrex.")
 
         return currencies
 
@@ -40,6 +41,6 @@ class Bittrex(Exchange):
             Exchange.Currency(c["CurrencyLong"], c["Currency"])
             for c in self._get_currencies() if c["IsActive"]]
 
-        self._log.info(f"Narrowed down to {len(currencies)} active currencies.")
+        self._log.debug(f"Narrowed down to {len(currencies)} active currencies.")
 
         return currencies

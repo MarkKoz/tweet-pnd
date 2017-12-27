@@ -27,7 +27,7 @@ def to_text(img) -> str:
 def parse_currency(text: str) -> Union[ParseResult, None]:
     log.debug("Parsing the text.")
 
-    for ex in g.exchanges:
+    for ex in exchanges:
         currencies: List[Exchange.Currency] = ex.get_active_currencies()
         currency: Union[Exchange.Currency, None] = next(
                 (c for c in currencies
