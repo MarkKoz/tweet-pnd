@@ -1,7 +1,7 @@
 import json
 import logging
 
-from utils import globals as g
+import utils.globals as g
 
 def load_config() -> bool:
     """

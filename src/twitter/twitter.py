@@ -2,8 +2,8 @@ import logging
 
 import tweepy
 
-from utils import globals as g
 from twitter.stream_listener import StreamListener
+import utils.globals as g
 
 class Twitter:
     def __init__(self, callback = None):

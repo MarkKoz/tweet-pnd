@@ -32,13 +32,16 @@ for configuration of the bot. Below is the base configuration for the bot:
             "key": "",
             "secret": ""
         },
-        "preferred": "bittrex"
+        "preferred": "bittrex",
+        "verbose: false
     }
 }
 ```
 
 * `tesseract_cmd` - Path to the tesseract binary; ignored if empty. Unnecessary
 if it is in the system's `PATH`.
+* `verbose` - `true` if the logger should be more verbose e.g. show debug
+messages; `false` otherwise.
 
 #### Twitter
 * `key` - Consumer key (API key)

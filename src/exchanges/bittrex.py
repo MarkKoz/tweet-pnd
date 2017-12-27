@@ -1,10 +1,12 @@
+from typing import List
 import logging
 
 from bittrex import Bittrex as bx
 
-from utils import globals as g
+from exchanges.exchange import Exchange
+import utils.globals as g
 
-class Bittrex:
+class Bittrex(Exchange):
     def __init__(self):
         self._log: logging.Logger = logging.getLogger("bot.exchanges.Bittrex")
         self._api: bx = self._get_api()
@@ -21,7 +23,7 @@ class Bittrex:
 
         return bx(key, secret)
 
-    def get_currencies(self) -> list:
+    def _get_currencies(self) -> list:
         currencies: dict = self._api.get_currencies()
 
         if not currencies["success"]:
@@ -33,11 +35,11 @@ class Bittrex:
 
         return currencies
 
-    def get_active_currencies(self, currencies: list = None) -> list:
-        if not currencies:
-            currencies = self.get_currencies()
+    def get_active_currencies(self) -> List[Exchange.Currency]:
+        currencies: List[Exchange.Currency] = [
+            Exchange.Currency(c["CurrencyLong"], c["Currency"])
+            for c in self._get_currencies() if c["IsActive"]]
 
-        active = [c for c in currencies if c["IsActive"]]
-        self._log.info(f"Narrowed down to {len(active)} active currencies.")
+        self._log.info(f"Narrowed down to {len(currencies)} active currencies.")
 
-        return active
+        return currencies

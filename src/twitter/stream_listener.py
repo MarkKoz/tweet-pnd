@@ -3,7 +3,7 @@ import logging
 import tweepy
 from tweepy.models import Status
 
-from utils import globals as g
+import utils.globals as g
 
 class StreamListener(tweepy.StreamListener):
     def __init__(self, user: int, callback = None):
