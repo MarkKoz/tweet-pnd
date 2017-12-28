@@ -15,7 +15,7 @@ def get_exchange_classes() -> dict:
         # Only subclasses of Exchange, excluding Exchange itself.
         return inspect.isclass(member) and \
                issubclass(member, Exchange) and \
-               member.__module__ != "exchanges.exchange"
+               member is not Exchange
 
     # Gets qualified names of all modules of the current package.
     modules: list = [sys.modules[f"{__package__}.{name}"]
@@ -30,8 +30,14 @@ def get_exchange_classes() -> dict:
 
 def get_exchanges() -> List[Exchange]:
     classes: dict = get_exchange_classes()
+    print(classes)
+
+    # Filter out exchanges with a priority of 0.
     exs = filterfalse(lambda item: not item[1]["priority"],
                       g.config["exchanges"].items())
+
+    # Sort exchanges by priority in ascending order.
     srt = sorted(exs, key = lambda ex: ex[1]["priority"])
 
+    # Construct an instance for each exchange.
     return list(map(lambda ex: classes[ex[0]](), srt))
