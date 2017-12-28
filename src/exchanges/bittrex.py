@@ -23,16 +23,31 @@ class Bittrex(Exchange):
 
         return bx(key, secret)
 
+    def get_markets(self) -> List[Exchange.Market]:
+        markets: dict = self._api.get_markets()
+
+        if not markets["success"]:
+            self._log.error("Markets could not be retrieved.")
+            return []
+
+        markets = markets["result"]
+        self._log.debug(f"Retrieved {len(markets)} markets.")
+
+        # TODO: Filter out inactive markets (not m["IsActive"])?
+        return list(map(lambda m: Exchange.Market(m["MarketName"],
+                                                  m["MarketCurrency"],
+                                                  m["BaseCurrency"]),
+                        markets))
+
     def _get_currencies(self) -> list:
         currencies: dict = self._api.get_currencies()
 
         if not currencies["success"]:
-            self._log.error("The currencies could not be retrieved from "
-                            "Bittrex.")
+            self._log.error("Currencies could not be retrieved.")
             return []
 
         currencies = currencies["result"]
-        self._log.debug(f"Retrieved {len(currencies)} currencies from Bittrex.")
+        self._log.debug(f"Retrieved {len(currencies)} currencies.")
 
         return currencies
 
