@@ -14,7 +14,7 @@ def load_config() -> bool:
         True if the configuration was successfully loaded; false otherwise.
     """
     try:
-        with open("Configuration.json", "r") as file:
+        with open("config.json", "r") as file:
             g.config = json.load(file)
 
         return True

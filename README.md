@@ -5,8 +5,8 @@ mentions of currencies available on Bittrex. Optionally searches for a key
 term/phrase first before searching for currencies.
 
 ### Configuration
-A file named `Configuration.json` and in the same directory as `bot.py` is used
-for configuration of the bot. Below is the base configuration for the bot:
+A file named `config.json`, located in `/res/`, is used as the configuration of
+the bot. Below is the base configuration for the bot:
 
 ```json
 {
