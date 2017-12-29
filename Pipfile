@@ -11,6 +11,7 @@ tweepy = "*"
 python-bittrex = "*"
 pytesseract = "*"
 python-binance = "*"
+coinmarketcap = "*"
 
 
 [dev-packages]

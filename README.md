@@ -69,6 +69,7 @@ Lower numbers have higher priority. Set to `0` to disable the exchange.
     installed on the system. See
     [this](https://github.com/tesseract-ocr/tesseract/wiki) page for more
     specific installation instructions.
+* [coinmarketcap](https://github.com/mrsmn/coinmarketcap)
 * [python-binance](https://github.com/sammchardy/python-binance)
 * [python-bittrex](https://github.com/ericsomdahl/python-bittrex)
 
