@@ -8,6 +8,7 @@ import utils.globals as g
 
 class Bittrex(Exchange):
     def __init__(self):
+        super().__init__(type(self).__name__)
         self._log: logging.Logger = logging.getLogger("bot.exchanges.Bittrex")
         self._api: bx = self._get_api()
 

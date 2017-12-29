@@ -9,6 +9,7 @@ import utils.globals as g
 
 class Binance(Exchange):
     def __init__(self):
+        super().__init__(type(self).__name__)
         self._log: logging.Logger = logging.getLogger("bot.exchanges.Binance")
         self._api = self._get_api()
 

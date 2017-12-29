@@ -7,7 +7,7 @@ import utils.globals as g
 
 class StreamListener(tweepy.StreamListener):
     def __init__(self, user: int, callback = None):
-        super(StreamListener, self).__init__()
+        super().__init__()
 
         self._log: logging.Logger = logging.getLogger("bot.twitter.StreamListener")
         self._callback = callback

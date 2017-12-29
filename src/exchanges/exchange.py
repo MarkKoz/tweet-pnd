@@ -9,6 +9,9 @@ class Exchange:
         ("symbol", str),
         ("name", str)])
 
+    def __init__(self, name: str):
+        self.name = name
+
     def get_markets(self):
         return
 
