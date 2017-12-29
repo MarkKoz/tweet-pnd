@@ -11,11 +11,11 @@ def on_tweet(url: str):
     text: str = image.to_text(img)
     g.log.debug(f"OCR Results | {text}")
 
-    result: image.ParseResult = image.parse_currency(text)
+    result = image.parse_currency(text)
 
     if result:
-        g.log.info(f"Currency | {result.currency.name} "
-                   f"({result.currency.symbol})")
+        g.log.info(f"Currency | {result.name} "
+                   f"({result.symbol})")
     else:
         g.log.info(f"No valid currency was found.")
 

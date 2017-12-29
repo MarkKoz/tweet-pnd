@@ -24,22 +24,15 @@ def to_text(img) -> str:
     log.debug("Performing OCR.")
     return pytesseract.image_to_string(img)
 
-def parse_currency(text: str) -> Union[ParseResult, None]:
+def parse_currency(text: str) -> Union[Exchange.Currency, None]:
     log.debug("Parsing the text.")
 
-    for ex in exchanges:
-        currencies: List[Exchange.Currency] = ex.get_active_currencies()
-        currency: Union[Exchange.Currency, None] = next(
-                (c for c in currencies
-                 if re.search(c.name + r"[( ]*?\(?" + c.symbol,
-                              text,
-                              re.IGNORECASE)),
+    g.db.cursor.execute("select * from currencies")
+
+    return next((Exchange.Currency(symbol, name)
+                 for symbol, name in g.db.cursor.fetchall()
+                 if re.search(name + r"[( ]*?\(?" + symbol, text, re.IGNORECASE)),
                 None)
-
-        if currency:
-            return ParseResult(ex, currency)
-
-    return None
 
 def init():
     global log
