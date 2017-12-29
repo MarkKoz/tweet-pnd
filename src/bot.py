@@ -1,5 +1,6 @@
 import logging
 
+from exchanges.db import Database
 from twitter.twitter import Twitter
 from utils import globals as g, utils, image
 
@@ -30,6 +31,7 @@ def main() -> None:
         g.log.setLevel(logging.DEBUG)
         g.log.handlers[0].setLevel(logging.DEBUG)
 
+    g.db = Database()
     image.init()
     twitter = Twitter(on_tweet)
 
