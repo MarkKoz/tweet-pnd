@@ -55,17 +55,18 @@ class Bittrex(Exchange):
 
     def buy_order(self, market: Exchange.Market) -> bool:
         rate: float = self._get_rate(market.name)
-        quantity: float = g.config["order"]["quote_currencies"][market.quote.lower()] / rate
+        total: float = g.config["order"]["quote_currencies"][market.quote.lower()]
+        quantity: float = total / rate
         response: dict = self._api.buy_limit(market.name, quantity, rate)
 
         if not response["success"]:
-            self._log.error(f"Order for {quantity} {market.base} for {rate} "
-                            f"{market.quote} could not be placed: "
-                            f"{response['message']}")
+            self._log.error(f"Order failed | {quantity} {market.base} @ "
+                            f"{rate} {market.quote} for a total of {total} "
+                            f"{market.quote}: {response['message']}")
             return False
 
-        self._log.info(f"Order for {quantity} {market.base} for {rate} "
-                       f"{market.quote} was placed.")
+        self._log.info(f"Order placed | {quantity} {market.base} @ {rate}"
+                       f" {market.quote} for a total of {total} {market.quote}.")
         self._log.debug(f"Order UUID | {response['result']['uuid']}")
 
         return True
