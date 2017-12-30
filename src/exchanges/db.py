@@ -2,6 +2,7 @@ import logging
 import sqlite3
 
 from exchanges import exchanges
+import utils.globals as g
 
 class Database:
     def __init__(self):
@@ -59,7 +60,7 @@ class Database:
         self.cursor.executemany("insert into currencies values (?, ?)",
                                 exchanges.get_currencies())
 
-        for ex in exchanges.get_exchanges():
+        for ex in g.exchanges:
             self.cursor.execute("insert into exchanges(name) values (?)",
                                 (ex.name,))
             ex_id = self.cursor.lastrowid

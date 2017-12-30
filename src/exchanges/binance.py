@@ -40,7 +40,7 @@ class Binance(Exchange):
         price: str = ticker["price"]
         self._log.debug(f"Retrieved asking price of {price} for {market}.")
 
-        if g.config["exchanges"]["binance"]["recvWindow"]:
+        if g.config["exchanges"]["binance"]["use_multiplier"]:
             return float(price) * (1 + g.config["order"]["multiplier"])
         else:
             return float(price)

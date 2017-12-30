@@ -34,7 +34,10 @@ class Bittrex(Exchange):
         ask: float = ticker["result"]["Ask"]
         self._log.debug(f"Retrieved asking price of {ask} for {market}.")
 
-        return ask * (1 + g.config["order"]["multiplier"])
+        if g.config["exchanges"]["bittrex"]["use_multiplier"]:
+            return ask * (1 + g.config["order"]["multiplier"])
+        else:
+            return ask
 
     def get_markets(self) -> List[Exchange.Market]:
         markets: dict = self._api.get_markets()

@@ -6,7 +6,7 @@ from exchanges.exchanges import Exchange
 from twitter.twitter import Twitter
 from utils import globals as g, utils, image
 
-def on_tweet(url: str):
+def on_tweet(url: str) -> None:
     g.log.debug(f"Image URL | {url}")
 
     img = image.get_image(url)
@@ -34,6 +34,7 @@ def main() -> None:
         g.log.setLevel(logging.DEBUG)
         g.log.handlers[0].setLevel(logging.DEBUG)
 
+    g.exchanges = exchanges.get_exchanges()
     g.db = Database()
     image.init()
     twitter = Twitter(on_tweet)

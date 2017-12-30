@@ -1,6 +1,7 @@
 from typing import NamedTuple
+import abc
 
-class Exchange:
+class Exchange(abc.ABC):
     Market = NamedTuple("Market", [
         ("name", str),
         ("base", str),
@@ -12,8 +13,10 @@ class Exchange:
     def __init__(self, name: str):
         self.name = name
 
+    @abc.abstractmethod
     def get_markets(self):
-        return
+        pass
 
+    @abc.abstractmethod
     def buy_order(self, market: Market) -> bool:
-        return False
+        pass

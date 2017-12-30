@@ -26,12 +26,15 @@ bot:
         "binance": {
             "priority": 0,
             "key": "",
-            "secret": ""
+            "secret": "",
+            "use_multiplier": false,
+            "recvWindow": 5000
         },
         "bittrex": {
             "priority": 1,
             "key": "",
-            "secret": ""
+            "secret": "",
+            "use_multiplier": true,
         }
     },
     "order": {
@@ -70,6 +73,10 @@ empty.
 Lower numbers have higher priority. Set to `0` to disable the exchange.
 * `key` -  The exchange's API key.
 * `secret` - The exchange's API secret.
+* `use_multiplier` - `true` to use the `multiplier` for this exchange; `false`
+otherwise.
+* `recvWindow` - If the order request is not processed in this amount of
+miliseconds, the request is cancelled. Only used with Binance.
 
 #### Orders
 * `quote_currencies` - A dictionary of currency ticker symbols for quote
@@ -77,9 +84,9 @@ currencies (currencies with which the tweeted currency can be bought) and the
 amounts to spend on the order. The order determines the priority of the
 currency; the first has the highest priority. It is safe to remove unwanted
 currencies from this dictionary.
-* `multiplier` - The price paid for the order is multiplied by `1 + multiplier`
-to account for any price increases between the request for the price and request
-for placing the order.
+* `multiplier` - The price paid for the currency is multiplied by
+`1 + multiplier` to account for any price increases between the request for the
+price and request for placing the order.
 
 ### Requirements
 #### Binaries
