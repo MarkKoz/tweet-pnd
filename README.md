@@ -33,10 +33,20 @@ the bot. Below is the base configuration for the bot:
             "secret": ""
         }
     },
+    "order": {
+        "quote_currencies": {
+            "btc": 0,
+            "eth": 0
+        },
+        "multiplier": 0
+    },
     "tesseract_cmd": "",
     "verbose: false
 }
 ```
+
+> **Note**: All strings, with the exception of authentication credentials,
+`user`, `search_term`, and `tesseract_cmd` must be completely lower case.
 
 * `tesseract_cmd` - Path to the tesseract binary; ignored if empty. Unnecessary
 if it is in the system's `PATH`.
@@ -59,6 +69,15 @@ empty.
 Lower numbers have higher priority. Set to `0` to disable the exchange.
 * `key` -  The exchange's API key.
 * `secret` - The exchange's API secret.
+
+#### Orders
+* `quote_currencies` - A dictionary of currency ticker symbols for quote
+currencies (currencies with which the tweeted currency can be bought) and the
+amounts to spend on the order. The order determines the priority of the
+currency; the first has the highest priority.
+* `multiplier` - The price paid for the order is multiplied by `1 + multiplier`
+to account for any price increases between the request for the price and request
+for placing the order.
 
 ### Requirements
 * [Python 3.6](https://www.python.org/downloads/) or higher
