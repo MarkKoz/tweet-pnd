@@ -5,8 +5,9 @@ mentions of currencies available on Bittrex. Optionally searches for a key
 term/phrase first before searching for currencies.
 
 ### Configuration
-A file named `config.json`, located in `/res/`, is used as the configuration of
-the bot. Below is the base configuration for the bot:
+A file named `config.json`, located in `/src/` (same directory as `bot.py`), is
+used as the configuration of the bot. Below is the base configuration for the
+bot:
 
 ```json
 {
@@ -41,12 +42,12 @@ the bot. Below is the base configuration for the bot:
         "multiplier": 0
     },
     "tesseract_cmd": "",
-    "verbose: false
+    "verbose": false
 }
 ```
 
-> **Note**: All strings, with the exception of authentication credentials,
-`user`, `search_term`, and `tesseract_cmd` must be completely lower case.
+> **Note**: All strings, with the exceptions of authentication credentials,
+`user`, `search_term`, and `tesseract_cmd`, must be completely lower case.
 
 * `tesseract_cmd` - Path to the tesseract binary; ignored if empty. Unnecessary
 if it is in the system's `PATH`.
@@ -74,28 +75,39 @@ Lower numbers have higher priority. Set to `0` to disable the exchange.
 * `quote_currencies` - A dictionary of currency ticker symbols for quote
 currencies (currencies with which the tweeted currency can be bought) and the
 amounts to spend on the order. The order determines the priority of the
-currency; the first has the highest priority.
+currency; the first has the highest priority. It is safe to remove unwanted
+currencies from this dictionary.
 * `multiplier` - The price paid for the order is multiplied by `1 + multiplier`
 to account for any price increases between the request for the price and request
 for placing the order.
 
 ### Requirements
+#### Binaries
 * [Python 3.6](https://www.python.org/downloads/) or higher
+    * Make sure the python directory and python/Scripts directory are in your
+    system's `PATH` environment variable.
+    * For Windows users especially,
+    [Anaconda](https://www.anaconda.com/download/) is recommended over the
+    standard installer from python.org.
+* [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
+    * See [this](https://github.com/tesseract-ocr/tesseract/wiki) page for more
+    specific installation instructions.
+#### Packages
+> **Note** `pipenv` can install these automatically from the provided pipfiles.
+
 * [tweepy](http://www.tweepy.org/)
 * [pytesseract](https://github.com/madmaze/pytesseract)
-    * Requires
-    [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) to be
-    installed on the system. See
-    [this](https://github.com/tesseract-ocr/tesseract/wiki) page for more
-    specific installation instructions.
 * [coinmarketcap](https://github.com/mrsmn/coinmarketcap)
-* [python-binance](https://github.com/sammchardy/python-binance)
-* [python-bittrex](https://github.com/ericsomdahl/python-bittrex)
+* `OPTIONAL` [python-binance](https://github.com/sammchardy/python-binance)
+    * Only required if Binance's priority is > 0 i.e. it's enabled.
+* `OPTIONAL` [python-bittrex](https://github.com/ericsomdahl/python-bittrex)
+    * Only required if Bittrex's priority is > 0 i.e. it's enabled.
+* `OPTIONAL` [pipenv](https://docs.pipenv.org/)
 
 ### Installation
 [pipenv](https://docs.pipenv.org/) can be used to simply the installation
 process. Once it is installed, `cd` into the root directory and install the
-dependencies from the pipefile with
+dependencies from the pipfile with
 
 ```bash
 pipenv install

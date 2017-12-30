@@ -49,10 +49,10 @@ class Database:
 
     def _drop(self):
         self.cursor.executescript("""
-            drop table exchange_markets;
-            drop table exchanges;
-            drop table markets;
-            drop table currencies;
+            drop table if exists exchange_markets;
+            drop table if exists exchanges;
+            drop table if exists markets;
+            drop table if exists currencies;
         """)
 
     def _populate(self):

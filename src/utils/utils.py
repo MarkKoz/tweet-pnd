@@ -1,3 +1,4 @@
+from pathlib import Path
 import json
 import logging
 
@@ -18,11 +19,14 @@ def load_config() -> bool:
             g.config = json.load(file)
 
         return True
-    except EnvironmentError:
-        g.log.error("An error occurred trying to load the configuration "
-                    "file. Ensure it exists, the bot has adequate "
-                    "permissions to access the file, and it is formatted "
-                    "properly.")
+    except EnvironmentError as e:
+        g.log.error("An error occurred trying to load the configuration file "
+                    f"from '{Path('config.json').resolve().absolute()}'. Ensure"
+                    " it exists and the bot has adequate permissions to access "
+                    f"the file: {e}")
+    except json.decoder.JSONDecodeError as e:
+        g.log.error("A JSON syntax error was encountered while trying to parse "
+                    f"the configuration: {e}")
         return False
 
 def get_logger(name: str, level: int = logging.INFO):
