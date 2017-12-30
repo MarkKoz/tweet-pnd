@@ -24,11 +24,24 @@ class Bittrex(Exchange):
 
         return bx(key, secret)
 
+    def _get_rate(self, market: str):
+        ticker: dict = self._api.get_ticker(market)
+
+        if not ticker["success"]:
+            self._log.error("Tick values could not be retrieved for {market}.")
+            return None
+
+        ask: float = ticker["result"]["Ask"]
+        self._log.debug(f"Retrieved asking price of {ask} for {market}.")
+
+        return ask * (1 + g.config["order"]["multiplier"])
+
     def get_markets(self) -> List[Exchange.Market]:
         markets: dict = self._api.get_markets()
 
         if not markets["success"]:
-            self._log.error("Markets could not be retrieved.")
+            self._log.error("Markets could not be retrieved: "
+                            f"{markets['message']}")
             return []
 
         markets = markets["result"]
@@ -40,23 +53,19 @@ class Bittrex(Exchange):
                                                   m["BaseCurrency"]),
                         markets))
 
-    def _get_currencies(self) -> list:
-        currencies: dict = self._api.get_currencies()
+    def buy_order(self, market: Exchange.Market) -> bool:
+        rate: float = self._get_rate(market.name)
+        quantity: float = g.config["order"]["quote_currencies"][market.quote.lower()] / rate
+        response: dict = self._api.buy_limit(market.name, quantity, rate)
 
-        if not currencies["success"]:
-            self._log.error("Currencies could not be retrieved.")
-            return []
+        if not response["success"]:
+            self._log.error(f"Order for {quantity} {market.base} for {rate} "
+                            f"{market.quote} could not be placed: "
+                            f"{response['message']}")
+            return False
 
-        currencies = currencies["result"]
-        self._log.debug(f"Retrieved {len(currencies)} currencies.")
+        self._log.info(f"Order for {quantity} {market.base} for {rate} "
+                       f"{market.quote} was placed.")
+        self._log.debug(f"Order UUID | {response['result']['uuid']}")
 
-        return currencies
-
-    def get_active_currencies(self) -> List[Exchange.Currency]:
-        currencies: List[Exchange.Currency] = [
-            Exchange.Currency(c["CurrencyLong"], c["Currency"])
-            for c in self._get_currencies() if c["IsActive"]]
-
-        self._log.debug(f"Narrowed down to {len(currencies)} active currencies.")
-
-        return currencies
+        return True

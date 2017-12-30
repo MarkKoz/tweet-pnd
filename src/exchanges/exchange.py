@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 class Exchange:
     Market = NamedTuple("Market", [
@@ -15,5 +15,5 @@ class Exchange:
     def get_markets(self):
         return
 
-    def get_active_currencies(self) -> List[Currency]:
-        return []
+    def buy_order(self, market: Market) -> bool:
+        return False

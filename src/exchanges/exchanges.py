@@ -26,15 +26,19 @@ def get_currencies() -> List[Exchange.Currency]:
     return list(map(lambda c: Exchange.Currency(c["symbol"], c["name"]),
                     Market().ticker(limit = 0)))
 
-def get_markets(currency: Exchange.Currency) -> DefaultDict[str, List[str]]:
+def get_markets(currency: Exchange.Currency) -> \
+        DefaultDict[str, List[Exchange.Market]]:
     g.log.debug(f"Getting markets for base currency {currency.symbol}.")
-    quotes: Tuple[str] = tuple(g.config["order"]["quote_currencies"])
-    cases: str = "\n".join(f"when '{ex}' then {i}" for i, ex in enumerate(quotes))
+    quotes: Tuple[str] = tuple(g.config["order"]["quote_currencies"].keys())
+    cases: str = "\n".join(f"when '{ex}' then {i}"
+                           for i, ex in enumerate(quotes))
 
     g.db.cursor.execute(f"""
         select 
             e.name,
-            em.name
+            em.name,
+            m.base,
+            m.quote
         from markets m
         join exchange_markets em
                 on m.id = em.market_id
@@ -50,19 +54,28 @@ def get_markets(currency: Exchange.Currency) -> DefaultDict[str, List[str]]:
             end
     """, (currency.symbol,) + quotes)
 
-    results: Tuple[str, str] = g.db.cursor.fetchall()
-    markets: DefaultDict[str, List[str]] = defaultdict(list)
+    results: Tuple[str, str, str, str] = g.db.cursor.fetchall()
+    markets: DefaultDict[str, List[Exchange.Market]] = defaultdict(list)
 
-    for ex, market in results:
-        markets[ex].append(market)
+    for ex, market, base, quote in results:
+        markets[ex].append(Exchange.Market(market, base, quote))
 
     return markets
 
-def place_order(data: DefaultDict[str, List[str]]) -> bool:
+def place_order(data: DefaultDict[str, List[Exchange.Market]]) -> bool:
     exchanges: List[Exchange] = get_exchanges()
+    g.log.debug("Attempting to place an order.")
 
     for exchange, markets in data.items():
         ex: Exchange = next(ex for ex in exchanges if ex.name == exchange)
 
         for market in markets:
-            return True
+            result: bool = ex.buy_order(market)
+
+            if result:
+                return True
+
+        g.log.warning(f"Orders failed to be placed for all of "
+                      f"{exchange}'s markets.")
+
+    g.log.warning(f"Orders failed to be placed for all exchanges.")
