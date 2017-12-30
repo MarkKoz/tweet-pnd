@@ -21,10 +21,6 @@ def get_exchanges() -> List[Exchange]:
                     ex[0].capitalize())()
             for ex in sorted(exs, key = lambda ex: ex[1]["priority"])]
 
-def find_exchange(exchange: str) -> Union[Exchange, None]:
-    g.log.debug(f"Finding Exchange instance for {exchange}.")
-    return next((ex for ex in g.exchanges if ex.name == exchange), None)
-
 def get_currencies() -> List[Exchange.Currency]:
     g.log.debug("Getting currencies from CoinMarketCap.")
     return list(map(lambda c: Exchange.Currency(c["symbol"], c["name"]),
@@ -70,23 +66,19 @@ def get_markets(currency: Exchange.Currency) -> \
 def place_order(data: DefaultDict[str, List[Exchange.Market]]) -> bool:
     g.log.debug("Attempting to place an order.")
 
-    # TODO: Make this respect the order of exchanges.
-    for exchange, markets in data.items():
-        ex: Union[Exchange, None] = find_exchange(exchange)
-
-        if not ex:
-            g.log.error(f"Couldn't find Exchange instance for {exchange}.")
+    for exchange in g.exchanges:
+        if exchange.name not in data:
+            g.log.debug(f"No markets were found for {exchange.name}; skipping.")
             continue
-        else:
-            g.log.debug(f"Found {exchange} instance.")
 
-        for market in markets:
-            result: bool = ex.buy_order(market)
+        for market in data[exchange.name]:
+            result: bool = exchange.buy_order(market)
 
             if result:
                 return True
 
-        g.log.warning(f"Orders failed to be placed for all of "
-                      f"{exchange}'s markets.")
+        g.log.warning(f"Orders failed to be placed for all of {exchange.name}'s"
+                      " markets.")
 
     g.log.warning(f"Orders failed to be placed for all exchanges.")
+    return False
