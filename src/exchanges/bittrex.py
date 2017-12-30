@@ -28,7 +28,7 @@ class Bittrex(Exchange):
         ticker: dict = self._api.get_ticker(market)
 
         if not ticker["success"]:
-            self._log.error("Tick values could not be retrieved for {market}.")
+            self._log.error(f"Tick values could not be retrieved for {market}.")
             return None
 
         ask: float = ticker["result"]["Ask"]
@@ -55,6 +55,10 @@ class Bittrex(Exchange):
 
     def buy_order(self, market: Exchange.Market) -> bool:
         rate: float = self._get_rate(market.name)
+
+        if not rate:
+            return False
+
         total: float = g.config["order"]["quote_currencies"][market.quote.lower()]
         quantity: float = total / rate
         response: dict = self._api.buy_limit(market.name, quantity, rate)

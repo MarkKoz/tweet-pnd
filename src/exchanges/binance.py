@@ -25,6 +25,26 @@ class Binance(Exchange):
 
         return Client(key, secret)
 
+    def _get_rate(self, market: str):
+        try:
+            ticker: dict = self._api.get_symbol_ticker(symbol = market)
+        except (BinanceAPIException, BinanceRequestException) as e:
+            if e.status_code == 429:
+                self._log.error("Being rate limited.")
+            elif e.status_code == 418:
+                self._log.error("IP banned for violation of rate limits.")
+
+            self._log.error(f"Tick values could not be retrieved for {market}.")
+            return None
+
+        price: str = ticker["price"]
+        self._log.debug(f"Retrieved asking price of {price} for {market}.")
+
+        if g.config["exchanges"]["binance"]["recvWindow"]:
+            return float(price) * (1 + g.config["order"]["multiplier"])
+        else:
+            return float(price)
+
     def get_markets(self) -> List[Exchange.Market]:
         try:
             markets: dict = self._api.get_exchange_info()
@@ -49,3 +69,29 @@ class Binance(Exchange):
                                                   m["baseAsset"],
                                                   m["quoteAsset"]),
                         markets))
+
+    def buy_order(self, market: Exchange.Market) -> bool:
+        rate: float = self._get_rate(market.name)
+
+        if not rate:
+            return False
+
+        total: float = g.config["order"]["quote_currencies"][market.quote.lower()]
+        quantity: float = total / rate
+
+        try:
+            response: dict = self._api.order_market_buy(
+                    symbol = market.name,
+                    quantity = total,
+                    recvWindow = g.config["exchanges"]["binance"]["recvWindow"])
+        except Exception as e:
+            self._log.error(f"Order failed | {quantity} {market.base} @ "
+                            f"{rate} {market.quote} for a total of {total} "
+                            f"{market.quote}: {e}")
+            return False
+
+        self._log.info(f"Order placed | {quantity} {market.base} @ {rate} "
+                       f"{market.quote} for a total of {total} {market.quote}.")
+        self._log.debug(f"Order ID | {response['clientOrderId']}")
+
+        return True

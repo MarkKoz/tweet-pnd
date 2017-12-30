@@ -66,6 +66,7 @@ def place_order(data: DefaultDict[str, List[Exchange.Market]]) -> bool:
     exchanges: List[Exchange] = get_exchanges()
     g.log.debug("Attempting to place an order.")
 
+    # TODO: Make this respect the order of exchanges.
     for exchange, markets in data.items():
         ex: Exchange = next(ex for ex in exchanges if ex.name == exchange)
 
