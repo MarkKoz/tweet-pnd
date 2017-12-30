@@ -1,6 +1,8 @@
 import logging
 
+from exchanges import exchanges
 from exchanges.db import Database
+from exchanges.exchanges import Exchange
 from twitter.twitter import Twitter
 from utils import globals as g, utils, image
 
@@ -11,11 +13,12 @@ def on_tweet(url: str):
     text: str = image.to_text(img)
     g.log.debug(f"OCR Results | {text}")
 
-    result = image.parse_currency(text)
+    currency: Exchange.Currency = image.parse_currency(text)
 
-    if result:
-        g.log.info(f"Currency | {result.name} "
-                   f"({result.symbol})")
+    if currency:
+        g.log.info(f"Currency | {currency.name} "
+                   f"({currency.symbol})")
+        exchanges.place_order(exchanges.get_markets(currency))
     else:
         g.log.info(f"No valid currency was found.")
 
