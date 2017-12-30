@@ -1,7 +1,7 @@
 from collections import defaultdict
 from importlib import import_module
 from itertools import filterfalse
-from typing import DefaultDict, List, Tuple
+from typing import DefaultDict, List, Tuple, Union
 
 from coinmarketcap import Market
 
@@ -20,6 +20,10 @@ def get_exchanges() -> List[Exchange]:
     return [getattr(import_module("." + ex[0], "exchanges"),
                     ex[0].capitalize())()
             for ex in sorted(exs, key = lambda ex: ex[1]["priority"])]
+
+def find_exchange(exchange: str) -> Union[Exchange, None]:
+    g.log.debug(f"Finding Exchange instance for {exchange}.")
+    return next((ex for ex in g.exchanges if ex.name == exchange), None)
 
 def get_currencies() -> List[Exchange.Currency]:
     g.log.debug("Getting currencies from CoinMarketCap.")
@@ -54,8 +58,9 @@ def get_markets(currency: Exchange.Currency) -> \
             end
     """, (currency.symbol,) + quotes)
 
-    results: Tuple[str, str, str, str] = g.db.cursor.fetchall()
+    results: List[Tuple[str, str, str, str]] = g.db.cursor.fetchall()
     markets: DefaultDict[str, List[Exchange.Market]] = defaultdict(list)
+    g.log.debug(f"Retrieved {len(results)} markets.")
 
     for ex, market, base, quote in results:
         markets[ex].append(Exchange.Market(market, base, quote))
@@ -67,7 +72,13 @@ def place_order(data: DefaultDict[str, List[Exchange.Market]]) -> bool:
 
     # TODO: Make this respect the order of exchanges.
     for exchange, markets in data.items():
-        ex: Exchange = next(ex for ex in g.exchanges if ex.name == exchange)
+        ex: Union[Exchange, None] = find_exchange(exchange)
+
+        if not ex:
+            g.log.error(f"Couldn't find Exchange instance for {exchange}.")
+            continue
+        else:
+            g.log.debug(f"Found {exchange} instance.")
 
         for market in markets:
             result: bool = ex.buy_order(market)
