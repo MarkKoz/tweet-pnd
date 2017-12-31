@@ -37,18 +37,7 @@ def main() -> None:
     g.exchanges = exchanges.get_exchanges()
     g.db = Database()
     image.init()
-    twitter = Twitter(on_tweet)
-
-    while twitter.stream.running:
-        inp: str = input("Enter 'exit' at any time to disconnect from the "
-                         "stream.\n")
-
-        if inp.lower() == "exit":
-            g.log.info("Disconnecting from the stream.")
-            twitter.stream.disconnect()
-            break
-
-    g.log.info("Stream has disconnected. The program will now close.")
+    Twitter(on_tweet)
 
 if __name__ == "__main__":
     main()

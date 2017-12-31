@@ -70,7 +70,7 @@ class Twitter:
         listener: StreamListener = StreamListener(user, callback)
         stream: tweepy.Stream = tweepy.Stream(auth = self._api.auth,
                                               listener = listener)
-        stream.filter(async = True, follow = [str(stream.listener.user)])
+        stream.filter(async = False, follow = [str(stream.listener.user)])
 
         return stream
 

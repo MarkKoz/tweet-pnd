@@ -42,6 +42,9 @@ class StreamListener(tweepy.StreamListener):
             if self._callback:
                 self._callback(photo["media_url"])
 
+                if g.config["twitter"]["disconnect_on_first"]:
+                    return False
+
     def on_error(self, status_code: int) -> bool:
         if status_code == 420:
             # TODO: Handle rate limiting properly.

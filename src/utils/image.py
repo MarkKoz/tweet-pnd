@@ -24,8 +24,8 @@ def parse_currency(text: str) -> Union[Exchange.Currency, None]:
     log.debug("Parsing the text.")
     g.db.cursor.execute("select * from currencies")
 
-    return next((Exchange.Currency(symbol, name)
-                 for symbol, name in g.db.cursor.fetchall()
+    return next((Exchange.Currency(symbol, name, precision)
+                 for symbol, name, precision in g.db.cursor.fetchall()
                  if re.search(name + r"[( ]*?\(?" + symbol,
                               text,
                               re.IGNORECASE)),

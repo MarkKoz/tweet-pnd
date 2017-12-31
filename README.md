@@ -20,7 +20,8 @@ bot:
         },
         "user": "",
         "search_term": "",
-        "ignore_retweets": true
+        "ignore_retweets": true,
+        "disconnect_on_first": true
     },
     "exchanges": {
         "binance": {
@@ -53,7 +54,8 @@ bot:
 `user`, `search_term`, and `tesseract_cmd`, must be completely lower case.
 
 * `tesseract_cmd` - Path to the tesseract binary; ignored if empty. Unnecessary
-if it is in the system's `PATH`.
+if it is in the system's `PATH`. Backslashes must be escaped with another
+backslash.
 * `verbose` - `true` if the logger should be more verbose e.g. show debug
 messages; `false` otherwise.
 
@@ -67,6 +69,8 @@ account's behalf.
 * `search_term` - A search term to use to filter the user's tweets; ignored if
 empty.
 * `ignore_retweets` - Does not parse tweets which are retweets.
+* `disconnect_on_first` - `true` to disconnect the stream after the first found
+tweet; `false` otherwise.
 
 #### Exchanges
 * `priority` - A positive integer representing the priority of the exchange.
@@ -99,6 +103,8 @@ price and request for placing the order.
 * [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
     * See [this](https://github.com/tesseract-ocr/tesseract/wiki) page for more
     specific installation instructions.
+    * Make sure it is set in your system's `PATH` environment variable or the
+    * `tesseract_cmd` is configured accordingly.
 #### Packages
 > **Note** `pipenv` can install these automatically from the provided pipfiles.
 
