@@ -31,6 +31,19 @@ class Binance(Exchange):
         return next((Decimal(f["stepSize"].rstrip("0")) for f in filters
                      if f["filterType"] == "LOT_SIZE"), None)
 
+    @staticmethod
+    def _get_quantity(market: Exchange.Market, price: Decimal) -> Decimal:
+        quote_symbol: str = market.quote.symbol.lower()
+        total_f: float = g.config["order"]["quote_currencies"][quote_symbol]
+        total: Decimal = Decimal(str(total_f))
+
+        step: Decimal = market.step
+        quantity: Decimal = \
+            (total / price).quantize(step, rounding = ROUND_DOWN) if step \
+            else (total / price)
+
+        return quantity
+
     def _get_price(self, market: Exchange.Market) -> Union[Decimal, None]:
         try:
             ticker: dict = self._api.get_symbol_ticker(symbol = market.name)
@@ -99,12 +112,8 @@ class Binance(Exchange):
         if not price:
             return False
 
-        quote_symbol: str = market.quote.symbol.lower()
-        total_f: float = g.config["order"]["quote_currencies"][quote_symbol]
-        total: Decimal = Decimal(str(total_f))
-        step: Decimal = market.step
-        quantity: Decimal = (total / price).quantize(step, rounding = ROUND_DOWN) \
-            if step else (total / price)
+        quantity: Decimal = self._get_quantity(market, price)
+        total: Decimal = quantity * price
 
         try:
             response: dict = self._api.order_market_buy(
