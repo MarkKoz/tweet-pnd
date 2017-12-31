@@ -51,9 +51,17 @@ class Bittrex(Exchange):
         self._log.debug(f"Retrieved {len(markets)} markets.")
 
         # TODO: Filter out inactive markets (not m["IsActive"])?
-        return list(map(lambda m: Exchange.Market(m["MarketName"],
-                                                  m["MarketCurrency"],
-                                                  m["BaseCurrency"]),
+        return list(map(lambda m: Exchange.Market(
+                            m["MarketName"],
+                            Exchange.Currency(
+                                    m["MarketCurrency"],
+                                    m["MarketCurrencyLong"],
+                                    None),
+                            Exchange.Currency(
+                                    m["BaseCurrency"],
+                                    m["BaseCurrencyLong"],
+                                    None),
+                            None),
                         markets))
 
     def buy_order(self, market: Exchange.Market) -> bool:
@@ -62,18 +70,21 @@ class Bittrex(Exchange):
         if not rate:
             return False
 
-        total: float = g.config["order"]["quote_currencies"][market.quote.lower()]
+        quote_symbol: str = market.quote.symbol.lower()
+        total: float = g.config["order"]["quote_currencies"][quote_symbol]
         quantity: float = total / rate
         response: dict = self._api.buy_limit(market.name, quantity, rate)
 
         if not response["success"]:
-            self._log.error(f"Order failed | {quantity} {market.base} @ "
-                            f"{rate} {market.quote} for a total of {total} "
-                            f"{market.quote}: {response['message']}")
+            self._log.error(f"Order failed | {quantity} {market.base.symbol} @ "
+                            f"{rate} {market.quote.symbol} for a total of "
+                            f"{total} {market.quote.symbol}: "
+                            f"{response['message']}")
             return False
 
-        self._log.info(f"Order placed | {quantity} {market.base} @ {rate}"
-                       f" {market.quote} for a total of {total} {market.quote}.")
+        self._log.info(f"Order placed | {quantity} {market.base.symbol} @ "
+                       f"{rate} {market.quote.symbol} for a total of {total} "
+                       f"{market.quote.symbol}.")
         self._log.debug(f"Order UUID | {response['result']['uuid']}")
 
         return True

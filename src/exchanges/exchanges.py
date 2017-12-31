@@ -1,4 +1,5 @@
 from collections import defaultdict
+from decimal import Decimal
 from importlib import import_module
 from itertools import filterfalse
 from typing import DefaultDict, List, Tuple, Union
@@ -23,7 +24,7 @@ def get_exchanges() -> List[Exchange]:
 
 def get_currencies() -> List[Exchange.Currency]:
     g.log.debug("Getting currencies from CoinMarketCap.")
-    return list(map(lambda c: Exchange.Currency(c["symbol"], c["name"]),
+    return list(map(lambda c: Exchange.Currency(c["symbol"], c["name"], None),
                     Market().ticker(limit = 0)))
 
 def get_markets(currency: Exchange.Currency) -> \
@@ -38,14 +39,23 @@ def get_markets(currency: Exchange.Currency) -> \
             e.name,
             em.name,
             m.base,
-            m.quote
+            (select precision 
+             from currencies 
+             where symbol = m.base 
+             limit 1) base_prec,
+            m.quote,
+            (select precision 
+             from currencies 
+             where symbol = m.base 
+             limit 1) quote_prec,
+            m.step
         from markets m
         join exchange_markets em
                 on m.id = em.market_id
         join exchanges e
                 on em.exchange_id = e.id
         where
-            base = ? and
+            base = upper(?) and
             lower(quote) in ({", ".join(["?"] * len(quotes))})
         order by
             e.name,
@@ -54,12 +64,16 @@ def get_markets(currency: Exchange.Currency) -> \
             end
     """, (currency.symbol,) + quotes)
 
-    results: List[Tuple[str, str, str, str]] = g.db.cursor.fetchall()
+    results: List[Tuple[str, str, str, int, str, int, Union[str, None]]] = g.db.cursor.fetchall()
     markets: DefaultDict[str, List[Exchange.Market]] = defaultdict(list)
     g.log.debug(f"Retrieved {len(results)} markets.")
 
-    for ex, market, base, quote in results:
-        markets[ex].append(Exchange.Market(market, base, quote))
+    for ex, market, base, base_prec, quote, quote_prec, step in results:
+        markets[ex].append(Exchange.Market(
+                market,
+                Exchange.Currency(base, None, base_prec),
+                Exchange.Currency(quote, None, quote_prec),
+                Decimal(step) if step else None))
 
     return markets
 

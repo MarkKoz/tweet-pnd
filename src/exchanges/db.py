@@ -27,13 +27,15 @@ class Database:
             create table if not exists currencies (
                 symbol text,
                 name text,
+                precision integer default null,
                 primary key (symbol, name)
             );       
 
             create table if not exists markets (
                 id integer primary key autoincrement,
                 base text references currencies(symbol) on delete cascade,
-                quote text references currencies(symbol) on delete cascade
+                quote text references currencies(symbol) on delete cascade,
+                step text default null
             );      
 
             create table if not exists exchanges (
@@ -57,7 +59,7 @@ class Database:
         """)
 
     def _populate(self):
-        self.cursor.executemany("insert into currencies values (?, ?)",
+        self.cursor.executemany("insert into currencies values (?, ?, ?)",
                                 exchanges.get_currencies())
 
         for ex in g.exchanges:
@@ -65,22 +67,41 @@ class Database:
                                 (ex.name,))
             ex_id = self.cursor.lastrowid
 
-            for name, base, quote in ex.get_markets():
+            for name, base, quote, step in ex.get_markets():
                 # Try to get the id of the market from the db.
                 self.cursor.execute(
                         "select id from markets where base = ? and quote = ?",
-                        (base, quote))
+                        (base.symbol, quote.symbol))
                 market_id = self.cursor.fetchone()
 
                 # If it doesn't exist, add it.
                 if not market_id:
-                    self.cursor.execute(
-                            "insert into markets(base, quote) values (?, ?)",
-                            (base, quote))
+                    self.cursor.execute("""
+                            insert into markets(base, quote, step) 
+                            values (?, ?, ?)
+                            """, (base.symbol,
+                                  quote.symbol,
+                                  str(step) if step else None))
                     market_id = self.cursor.lastrowid
                 else:
                     market_id = market_id[0]
 
+                    if step: # Updates the step if it isn't None.
+                        self.cursor.execute("""
+                        update markets set step = ? where id = ?
+                        """, (str(step), market_id))
+
                 self.cursor.execute(
                         "insert into exchange_markets values (?, ?, ?)",
                         (ex_id, market_id, name))
+
+                # Updates precisions if not None
+                if base.precision:
+                    self.cursor.execute("""
+                        update currencies set precision = ? where symbol = ?
+                        """, (base.precision, base.symbol))
+
+                if quote.precision:
+                    self.cursor.execute("""
+                        update currencies set precision = ? where symbol = ?
+                        """, (quote.precision, quote.symbol))

@@ -1,20 +1,24 @@
-from typing import NamedTuple
+from decimal import Decimal
+from typing import List, NamedTuple, Union
 import abc
 
 class Exchange(abc.ABC):
-    Market = NamedTuple("Market", [
-        ("name", str),
-        ("base", str),
-        ("quote", str)])
     Currency = NamedTuple("Currency", [
         ("symbol", str),
-        ("name", str)])
+        ("name", Union[str, None]),
+        ("precision", Union[int, None])])
+
+    Market = NamedTuple("Market", [
+        ("name", str),
+        ("base", Currency),
+        ("quote", Currency),
+        ("step", Union[Decimal, None])])
 
     def __init__(self, name: str):
         self.name = name
 
     @abc.abstractmethod
-    def get_markets(self):
+    def get_markets(self) -> List[Market]:
         pass
 
     @abc.abstractmethod
