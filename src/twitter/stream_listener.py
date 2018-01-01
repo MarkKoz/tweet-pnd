@@ -24,18 +24,18 @@ class StreamListener(tweepy.StreamListener):
         if status.author.id == self.user:
             if g.config["twitter"]["ignore_retweets"] and \
                     hasattr(status, "retweeted_status"):
-                return
+                return True
 
             term: str = g.config["twitter"]["search_term"]
-            if term and term.lower() not in text: return
+            if term and term.lower() not in text: return True
 
-            if not hasattr(status, "entities"): return
+            if not hasattr(status, "entities"): return True
 
-            media = status.entities["media"]
-            if not media: return
+            media = status.entities["media"] if "media" in status.entities else None
+            if not media: return True
 
             photo = next((o for o in media if o["type"] == "photo"),  None)
-            if not photo: return
+            if not photo: return True
 
             self._log.info(f"User tweeted | {status.text}")
 
@@ -44,6 +44,8 @@ class StreamListener(tweepy.StreamListener):
 
                 if g.config["twitter"]["disconnect_on_first"]:
                     return False
+
+        return True
 
     def on_error(self, status_code: int) -> bool:
         if status_code == 420:

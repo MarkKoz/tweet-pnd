@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from exchanges import exchanges
 from exchanges.db import Database
@@ -34,10 +35,14 @@ def main() -> None:
         g.log.setLevel(logging.DEBUG)
         g.log.handlers[0].setLevel(logging.DEBUG)
 
-    g.exchanges = exchanges.get_exchanges()
-    g.db = Database()
-    image.init()
-    Twitter(on_tweet)
+    try:
+        g.exchanges = exchanges.get_exchanges()
+        g.db = Database()
+        image.init()
+        Twitter(on_tweet)
+    except Exception as e:
+        g.log.critical(f"{type(e).__name__}: {e}")
+        g.log.critical(traceback.format_exc())
 
 if __name__ == "__main__":
     main()
