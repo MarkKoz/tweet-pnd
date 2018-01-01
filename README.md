@@ -56,8 +56,8 @@ bot:
 * `tesseract_cmd` - Path to the tesseract binary; ignored if empty. Unnecessary
 if it is in the system's `PATH`. Backslashes must be escaped with another
 backslash.
-* `verbose` - `true` if the logger should be more verbose e.g. show debug
-messages; `false` otherwise.
+* `verbose` - `true` if the console logger should be more verbose i.e. show
+debug-level messages; `false` otherwise.
 
 #### Twitter
 * `key` - Consumer key (API key)

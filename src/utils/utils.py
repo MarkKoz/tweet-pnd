@@ -47,10 +47,28 @@ def get_logger(name: str, level: int = logging.INFO):
     """
     logger: logging.Logger = logging.getLogger(name)
     logger.setLevel(level)
+    formatter: logging.Formatter = logging.Formatter(
+        "%(asctime)s - [%(levelname)s] %(name)s: %(message)s")
 
     handler: logging.Handler = logging.StreamHandler()
     handler.setLevel(level)
-    handler.setFormatter(logging.Formatter("%(asctime)s - [%(levelname)s] "
-                                           "%(name)s: %(message)s"))
+    handler.setFormatter(formatter)
     logger.addHandler(handler)
+
+    file_handler: logging.Handler = logging.FileHandler(
+            filename = "log.txt",
+            encoding = "utf-8",
+            mode = "w")
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    file_handler_debug: logging.Handler = logging.FileHandler(
+            filename = "log_debug.txt",
+            encoding = "utf-8",
+            mode = "w")
+    file_handler_debug.setLevel(logging.DEBUG)
+    file_handler_debug.setFormatter(formatter)
+    logger.addHandler(file_handler_debug)
+
     g.log = logger
