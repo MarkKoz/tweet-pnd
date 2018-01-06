@@ -5,14 +5,17 @@ import logging
 import utils.globals as g
 
 def load_config() -> bool:
-    """
-    Retrieves the configuration from Configuration.json. The JSON is
-    deserialised into a :class:`dictionary<dict>`.
+    """Loads a configuration from a file.
+
+    Retrieves the configuration from :file:`Configuration.json`. The JSON is
+    deserialised into a :class:`dictionary<dict>` and set as the
+    :data:`global config<utils.globals.config>`.
 
     Returns
     -------
     bool
-        True if the configuration was successfully loaded; false otherwise.
+        :keyword:`True` if the configuration was successfully loaded;
+        :keyword:`false` otherwise.
     """
     try:
         with open("config.json", "r") as file:
@@ -30,20 +33,31 @@ def load_config() -> bool:
         return False
 
 def get_logger(name: str, level: int = logging.INFO):
-    """
-    Creates and starts a logger with the given name and logging level.
+    """Creates the global Logger.
+
+    Creates a :class:`Logger<logging.Logger>` named :any:`name` and sets it as
+    the :data:`global logger<utils.globals.log>`. Messages are formatted using
+    the format string ``"%(asctime)s - [%(levelname)s] %(name)s: %(message)s"``.
+
+    The Logger uses three :class:`Handlers<logging.Handler>` to log to:
+
+    * :abbr:`stdout (standard output)` stream with
+      :attr:`logging level<logging.Handler.level>` :any:`level`.
+    * :file:`log.txt` with logging level :attr:`~logging.INFO`.
+    * :file:`log_debug.txt` with logging level :attr:`~logging.DEBUG`.
 
     Parameters
     ----------
     name: str
-        The name of the logger.
+        The :attr:`~logging.Logger.name` of the Logger.
     level: int, optional
-        The logging level of the logger.
+        The :attr:`logging level<logging.Handler.level>` of the ``stdout``
+        :class:`StreamHandler<logging.StreamHandler>`.
 
     Returns
     -------
     logging.Logger
-        The logger which is created.
+        The Logger which is created.
     """
     logger: logging.Logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -64,7 +78,7 @@ def get_logger(name: str, level: int = logging.INFO):
     logger.addHandler(file_handler)
 
     file_handler_debug: logging.Handler = logging.FileHandler(
-            filename = "log_debug.txt",
+            filename = "log-debug.txt",
             encoding = "utf-8",
             mode = "w")
     file_handler_debug.setLevel(logging.DEBUG)

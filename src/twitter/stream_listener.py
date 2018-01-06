@@ -1,3 +1,5 @@
+from logging.handlers import TimedRotatingFileHandler
+from typing import Optional
 import logging
 
 import tweepy
@@ -10,9 +12,28 @@ class StreamListener(tweepy.StreamListener):
         super().__init__()
 
         self._log: logging.Logger = logging.getLogger("bot.twitter.StreamListener")
+        self._log_t: Optional[logging.Logger] = \
+            self.get_logger() if g.config["twitter"]["log_tweets"] else None
         self._callback = callback
 
         self.user: int = user
+
+    @staticmethod
+    def get_logger() -> logging.Logger:
+        logger: logging.Logger = logging.getLogger("StreamLogger")
+        logger.setLevel(logging.INFO)
+        formatter: logging.Formatter = logging.Formatter(
+                "%(asctime)s - %(message)s")
+
+        handler: TimedRotatingFileHandler = TimedRotatingFileHandler(
+                filename = f"log-tweets-{g.config['twitter']['user']}.txt",
+                when = "midnight",
+                encoding = "utf-8")
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+        return logger
 
     def on_connect(self):
         self._log.info("Stream connected.")
@@ -22,6 +43,9 @@ class StreamListener(tweepy.StreamListener):
 
         # Only parses statuses by the user.
         if status.author.id == self.user:
+            if self._log_t:
+                self._log_t.info(status.text)
+
             if g.config["twitter"]["ignore_retweets"] and \
                     hasattr(status, "retweeted_status"):
                 return True

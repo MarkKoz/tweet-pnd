@@ -21,7 +21,8 @@ bot:
         "user": "",
         "search_term": "",
         "ignore_retweets": true,
-        "disconnect_on_first": true
+        "disconnect_on_first": true,
+        "log_tweets": false
     },
     "exchanges": {
         "binance": {
@@ -71,6 +72,9 @@ empty.
 * `ignore_retweets` - Does not parse tweets which are retweets.
 * `disconnect_on_first` - `true` to disconnect the stream after the first found
 tweet; `false` otherwise.
+* `log_tweets` - `true` to log user's tweets to a file; `false` otherwise. A new
+file is created every day at midnight. Old files have the date appended to their
+name.
 
 #### Exchanges
 * `priority` - A positive integer representing the priority of the exchange.
