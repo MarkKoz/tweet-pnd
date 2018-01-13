@@ -89,7 +89,7 @@ def parse_currency(text: str) -> Optional[Exchange.Currency]:
     return next((Exchange.Currency(symbol, name, precision)
                  for symbol, name, precision in g.db.cursor.fetchall()
                  if re.search((name if g.config["search_currency_name"] else "")
-                                  + r"\s*?\(+?\s*?" + symbol + r"(?!\w)",
+                                  + r"\s*?[(\[{]+?\s*?" + symbol + r"\s*?[)\]}]",
                               text,
                               re.IGNORECASE)),
                 None)
