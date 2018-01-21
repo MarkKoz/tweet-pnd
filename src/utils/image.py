@@ -58,7 +58,9 @@ def to_text(img: Image.Image) -> str:
         The resulting text from OCR.
     """
     log.debug("Performing OCR.")
-    return pytesseract.image_to_string(img)
+    config = f'--tessdata-dir "{g.config["tessdata_dir"]}"' if g.config["tessdata_dir"] else None
+
+    return pytesseract.image_to_string(img, config = config)
 
 def parse_currency(text: str) -> Optional[Exchange.Currency]:
     """Finds a currency in a string.

@@ -49,6 +49,7 @@ bot:
         "multiplier": 0
     },
     "search_currency_name": false,
+    "tessdata_dir": "",
     "tesseract_cmd": "",
     "verbose": false
 }
@@ -60,7 +61,11 @@ bot:
 * `search_currency_name` - `true` to include currency names (in addition to
 ticker symbols) in the regular expression used to search for a currency in the
 OCR result text; `false` to only include currency ticker symbols.
-* `tesseract_cmd` - Path to the tesseract binary; ignored if empty. Unnecessary
+* `tessdata_dir` - Path to Tesseract's tessdata folder. Set this if the bot
+is on a different drive than Tesseract is installed to - particularly if using
+Windows. This folder is typically located under the Tesseract install's root
+directory.
+* `tesseract_cmd` - Path to the Tesseract binary; ignored if empty. Unnecessary
 if it is in the system's `PATH`. Backslashes must be escaped with another
 backslash.
 * `verbose` - `true` if the console logger should be more verbose i.e. show
