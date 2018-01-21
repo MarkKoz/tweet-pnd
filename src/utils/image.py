@@ -83,7 +83,7 @@ def parse_currency(text: str) -> Optional[Exchange.Currency]:
         The first matching currency found in the string, or :any:`None` if no
         matches are found.
     """
-    log.debug("Parsing the text.")
+    log.debug("Searching for a currency in the text.")
     g.db.cursor.execute("select * from currencies")
 
     return next((Exchange.Currency(symbol, name, precision)

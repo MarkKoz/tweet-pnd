@@ -21,6 +21,8 @@ bot:
         "user": "",
         "search_term": "",
         "ignore_retweets": true,
+        "parse_text": true,
+        "parse_image": true,
         "disconnect_on_first": true,
         "log_tweets": false
     },
@@ -73,6 +75,11 @@ account's behalf.
 * `user` - The Twitter handle of the user whose tweets will be read.
 * `search_term` - A search term to use to filter the user's tweets; ignored if
 empty.
+* `search_text` - `true` to search for currencies in the tweet's text; `false`
+otherwise.
+* `search_image` - `true` to search for currencies in the tweet's attached
+image; `false` otherwise. The image will not be parsed if a currency has already
+been found in the text.
 * `ignore_retweets` - Does not parse tweets which are retweets.
 * `disconnect_on_first` - `true` to disconnect the stream after the first found
 tweet; `false` otherwise.

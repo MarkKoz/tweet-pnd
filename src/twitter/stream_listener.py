@@ -8,18 +8,18 @@ from tweepy.models import Status
 import utils.globals as g
 
 class StreamListener(tweepy.StreamListener):
-    def __init__(self, user: int, callback = None):
+    def __init__(self, user: int, callback):
         super().__init__()
 
         self._log: logging.Logger = logging.getLogger("bot.twitter.StreamListener")
         self._log_t: Optional[logging.Logger] = \
-            self.get_logger() if g.config["twitter"]["log_tweets"] else None
+            self._get_logger() if g.config["twitter"]["log_tweets"] else None
         self._callback = callback
 
         self.user: int = user
 
     @staticmethod
-    def get_logger() -> logging.Logger:
+    def _get_logger() -> logging.Logger:
         logger: logging.Logger = logging.getLogger("StreamLogger")
         logger.setLevel(logging.INFO)
         formatter: logging.Formatter = logging.Formatter(
@@ -35,39 +35,72 @@ class StreamListener(tweepy.StreamListener):
 
         return logger
 
+    @staticmethod
+    def _get_photo(status: Status) -> Optional[str]:
+        # Ignores statuses without entities.
+        if not hasattr(status, "extended_entities"):
+            return None
+
+        # Ignores statuses without a media entity.
+        media = status.extended_entities[
+            "media"] if "media" in status.extended_entities else None
+        if not media:
+            return None
+
+        # Tries to find the first occurrence of a photo media entity.
+        return next((o for o in media if o["type"] == "photo"), None)
+
+    def _validate_status(self, status: Status) -> bool:
+        # Only parses statuses by the user.
+        if status.author.id != self.user:
+            return False
+
+        # Logs each status if the option is enabled.
+        if self._log_t:
+            self._log_t.info(status.text)
+
+        # Ignores retweets if the option is enabled.
+        if g.config["twitter"]["ignore_retweets"] and \
+                hasattr(status, "retweeted_status"):
+            return False
+
+        # Ignores statuses which don't contain the search term.
+        term: str = g.config["twitter"]["search_term"]
+        if term and term.lower() not in status.text.lower():
+            return False
+
+        return True
+
     def on_connect(self):
         self._log.info("Stream connected.")
 
     def on_status(self, status: Status):
-        text: str = status.text.lower()
+        if not self._validate_status(status):
+            return True
 
-        # Only parses statuses by the user.
-        if status.author.id == self.user:
-            if self._log_t:
-                self._log_t.info(status.text)
+        search_text: bool = g.config["twitter"]["search_text"]
+        search_image: bool = g.config["twitter"]["search_image"]
 
-            if g.config["twitter"]["ignore_retweets"] and \
-                    hasattr(status, "retweeted_status"):
+        if search_text:
+            result: bool = self._callback(text = status.text)
+
+            # Returns if successful or image parsing is disabled.
+            if (search_image and result) or not search_image:
+                self._log.info(f"User tweeted | {status.text}")
+
+                return not g.config["twitter"]["disconnect_on_first"]
+
+        if search_image:
+            photo: Optional[str] = self._get_photo(status)
+
+            # Ignores the status if it doesn't have a photo.
+            if not photo:
                 return True
 
-            term: str = g.config["twitter"]["search_term"]
-            if term and term.lower() not in text: return True
-
-            if not hasattr(status, "entities"): return True
-
-            media = status.entities["media"] if "media" in status.entities else None
-            if not media: return True
-
-            photo = next((o for o in media if o["type"] == "photo"),  None)
-            if not photo: return True
-
             self._log.info(f"User tweeted | {status.text}")
+            self._callback(image_url = photo["media_url"])
 
-            if self._callback:
-                self._callback(photo["media_url"])
-
-                if g.config["twitter"]["disconnect_on_first"]:
-                    return False
+            return not g.config["twitter"]["disconnect_on_first"]
 
         return True
 

@@ -1,18 +1,18 @@
 from decimal import Decimal
-from typing import List, NamedTuple, Union
+from typing import List, NamedTuple, Optional
 import abc
 
 class Exchange(abc.ABC):
     Currency = NamedTuple("Currency", [
         ("symbol", str),
-        ("name", Union[str, None]),
-        ("precision", Union[int, None])])
+        ("name", Optional[str]),
+        ("precision", Optional[int])])
 
     Market = NamedTuple("Market", [
         ("name", str),
         ("base", Currency),
         ("quote", Currency),
-        ("step", Union[Decimal, None])])
+        ("step", Optional[Decimal])])
 
     def __init__(self, name: str):
         self.name = name
