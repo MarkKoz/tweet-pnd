@@ -20,9 +20,9 @@ bot:
         },
         "user": "",
         "search_term": "",
+        "search_text": true,
+        "search_image": true,
         "ignore_retweets": true,
-        "parse_text": true,
-        "parse_image": true,
         "disconnect_on_first": true,
         "log_tweets": false
     },
