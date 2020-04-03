@@ -7,11 +7,11 @@ name = "pypi"
 
 [packages]
 
-tweepy = "*"
-python-bittrex = "*"
-pytesseract = "*"
-python-binance = "*"
-coinmarketcap = "*"
+tweepy = "==3.5.0"
+python-bittrex = "==0.2.2"
+pytesseract = "==0.1.7"
+python-binance = "==0.5.12"
+coinmarketcap = "==4.1.1"
 
 
 [dev-packages]
